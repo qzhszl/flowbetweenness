@@ -43,26 +43,26 @@ T = graph(A);
 % 'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
 % x = h1.XData;
 % y = h1.YData;
-D = distances(T);
+% D = distances(T);
 Aforomega = A;
 Aforomega(Aforomega ~= 0) = 1 ./ Aforomega(Aforomega ~= 0);
-Omega = EffectiveResistance(Aforomega)
+Omega = EffectiveResistance(Aforomega);
+D = Omega
 
 Input_Omega = Omega;
-W  = Input_Omega
-W(W ~= 0) = 1 ./ W(W ~= 0);
-Omega_new = EffectiveResistance(W)
+W_tilde  = Input_Omega
+W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);
+Omega_new = EffectiveResistance(W_tilde)            % Compute the effective resistance Omega
 val = 1
-
-while(nnz(S_P > D) == 0 && val > 0)                     % Remove links one by one until we exceed the constraints
-    Omega = Omega_G(W_tilde);                           % Compute the effective resistance Omega
-    R = A.*((Omega+eye(N)).^-1 - W_tilde).*(D-S_P);     % Compute R
-    [val,~] = max(max(R));                              % Identify the maximum element
-    [row,col] = find(R == val);                         % Identify the link
-    A(row(1),col(1)) = 0; A(col(1),row(1)) = 0;         % Remove the link
-    W = k*A.*D;
-    W_tilde = (W+(ones(N)-A)).^-1-(ones(N)-A);          % Compute W tilde
-    S_P = distances(graph(W, 'lower'));                 % Update the shortest path weight matrix
+A = (W_tilde > 0);
+while(nnz(Omega_new > D) == 0 && val > 0)                     % Remove links one by one until we exceed the constraints                            
+    R = A.*((Omega_new+eye(N)).^-1 - W_tilde)     % Compute R
+    [val,~] = max(max(R))                              % Identify the maximum element
+    [row,col] = find(R == val);                        % Identify the link
+    A(row(1),col(1)) = 0; A(col(1),row(1)) = 0;        % Remove the link
+    W_tilde = A.*D
+    W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);      % Compute W tilde
+    Omega_new = EffectiveResistance(W_tilde)                 % Update the shortest path weight matrix
 end
 
 % Aforomega = A;
