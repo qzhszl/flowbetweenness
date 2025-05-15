@@ -10,7 +10,7 @@ clear, clc
 % 4. remove that link
 % 5. renormalize the link
 % 6. update the \Omega
-% 7. repeat 2-6 until \Omega>D : Return lastly removed link
+% 7. repeat 2-6 until minimum Diff between i and j: Return lastly removed link
 
 % 1. generate a graph
 % (a) tree:
@@ -22,10 +22,11 @@ clear, clc
 % 'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
 
 % 1. generate a graph
+% _________________________________________________________________________
 % (a) tree:
-N = 10;
-T = generate_a_tree(N,1,10);
-A_input = full(adjacency(T,"weighted"));
+N = 6;
+% T = generate_a_tree(N,1,10);
+% A_input = full(adjacency(T,"weighted"));
 % A_input = [0	0	0	0	0	0	0	0	3	6
 %     0	0	0	0	0	0	6	10	0	0
 %     0	0	0	0	2	0	0	2	0	0
@@ -37,7 +38,7 @@ A_input = full(adjacency(T,"weighted"));
 %     3	0	0	0	4	0	0	0	0	3
 %     6	0	0	0	0	0	0	0	3	0];
 
-% A_input = GenerateERfast(N,0.5,10)
+A_input = GenerateERfast(N,0.5,10)
 
 
 T = graph(A_input);
@@ -46,34 +47,42 @@ h1 = plot(T,'EdgeLabel',T.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
 'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
 x = h1.XData;
 y = h1.YData;
-Omega = EffectiveResitance_withinverseA(A_input)
+% D = distances(T);
+Aforomega = A_input;
+Aforomega(Aforomega ~= 0) = 1 ./ Aforomega(Aforomega ~= 0);
+Omega = EffectiveResistance(Aforomega);
 % Generate a demand matrix
 D = Omega
 
 Input_Omega = D;
 W_tilde  = Input_Omega
-% W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);
-% Omega_new = EffectiveResistance(W_tilde)            % Compute the effective resistance Omega
-
-Omega_new = EffectiveResitance_withinverseA(W_tilde)
-
-
+W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);
+Omega_new = EffectiveResistance(W_tilde)            % Compute the effective resistance Omega
 OmegaDiff = round(D-Omega_new,10);
 diff_change = sum(sum(OmegaDiff))
 val = 1;
+flag = 1;
 A = (W_tilde > 0);
-while(nnz(OmegaDiff<0)==0 && val > 0)                     % Remove links one by one until we exceed the constraints                            
-    % method 1 R = A.*((Omega_new+eye(N)).^-1 - W_tilde)*(D-Omega_new)
-    W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);
+Gnow = graph(W_tilde,"upper");
+while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remove links one by one until we exceed the constraints                            
+    previous_change = diff_change;
+    % method 1 R = A.*((Omega_new+eye(N)).^-1 - W_tilde)*(D-Omega_new) 
     R = A.*((Omega_new+eye(N)).^-1 - W_tilde).*(D-Omega_new);     % Compute R
     [val,~] = max(max(R));                              % Identify the maximum element
     [row,col] = find(R == val);                        % Identify the link
     A(row(1),col(1)) = 0; A(col(1),row(1)) = 0;        % Remove the link
     W_tilde = A.*D;
+    W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);      % Compute W tilde
+    Gnow = graph(W_tilde,"upper");
+    Omega_new = EffectiveResistance(W_tilde);               % Update the shortest path weight matrix
     
-    Omega_new = EffectiveResitance_withinverseA(W_tilde);               % Update the shortest path weight matrix
-    OmegaDiff = round(D-Omega_new,10)                          
+    OmegaDiff = round(D-Omega_new,10);                          
     diff_change = sum(sum(OmegaDiff))
+    if diff_change > previous_change
+        flag=0;
+    end
+    
+    
 end
 
 if(row(1) ~= col(1))
