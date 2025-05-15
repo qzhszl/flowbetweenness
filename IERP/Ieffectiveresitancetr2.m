@@ -24,7 +24,7 @@ clear, clc
 % 1. generate a graph
 % _________________________________________________________________________
 % (a) tree:
-N = 6;
+N = 10;
 % T = generate_a_tree(N,1,10);
 % A_input = full(adjacency(T,"weighted"));
 % A_input = [0	0	0	0	0	0	0	0	3	6
@@ -39,6 +39,14 @@ N = 6;
 %     6	0	0	0	0	0	0	0	3	0];
 
 A_input = GenerateERfast(N,0.5,10)
+
+% A_input = [0	5	0	4	0	5
+% 5	0	0	5	0	2
+% 0	0	0	9	0	0
+% 4	5	9	0	5	8
+% 0	0	0	5	0	0
+% 5	2	0	8	0	0];
+
 
 
 T = graph(A_input);
@@ -69,7 +77,7 @@ while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remo
     % method 1 R = A.*((Omega_new+eye(N)).^-1 - W_tilde)*(D-Omega_new) 
     R = A.*((Omega_new+eye(N)).^-1 - W_tilde).*(D-Omega_new);     % Compute R
     [val,~] = max(max(R));                              % Identify the maximum element
-    [row,col] = find(R == val);                        % Identify the link
+    [row,col] = find(R == val)                        % Identify the link
     A(row(1),col(1)) = 0; A(col(1),row(1)) = 0;        % Remove the link
     W_tilde = A.*D;
     W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);      % Compute W tilde
@@ -78,11 +86,9 @@ while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remo
     
     OmegaDiff = round(D-Omega_new,10);                          
     diff_change = sum(sum(OmegaDiff))
-    if diff_change > previous_change
+    if abs(diff_change) > abs(previous_change)
         flag=0;
-    end
-    
-    
+    end    
 end
 
 if(row(1) ~= col(1))
@@ -92,6 +98,11 @@ if(row(1) ~= col(1))
 end
 
 final_result = EffectiveResitance_withinverseA(W)
+
+OmegaDiff = round(D-Omega_new,10);
+diff_change = sum(sum(OmegaDiff))
+
+
 A_OLR = A;
 % Store the results
 % 1. The number of links added in the graph
