@@ -24,7 +24,7 @@ clear, clc
 % 1. generate a graph
 % _________________________________________________________________________
 % (a) tree:
-N = 10;
+N = 100;
 % T = generate_a_tree(N,1,10);
 % A_input = full(adjacency(T,"weighted"));
 % A_input = [0	0	0	0	0	0	0	0	3	6
