@@ -24,7 +24,7 @@ clear, clc
 % 1. generate a graph
 % _________________________________________________________________________
 % (a) tree:
-N = 100;
+N = 200;
 % T = generate_a_tree(N,1,10);
 % A_input = full(adjacency(T,"weighted"));
 % A_input = [0	0	0	0	0	0	0	0	3	6
@@ -115,7 +115,7 @@ L_DOR = 0.5*nnz(A_OLR)
 % 3. The number of common links between two graphs
 L_comm_OLR = nnz(A_input.*A_OLR)/nnz(A_input); 
 % 4. The norm of common links between two graphs
-Norm_OLR = sum(sum((D - final_result)./(D+(D==0))))/(N*(N-1))
+Norm_OLR = sum(sum((abs(D - final_result))./(D+(D==0))))/(N*(N-1))
 
 G_OLR = graph(W,"upper");
 subplot(1,2,2)
