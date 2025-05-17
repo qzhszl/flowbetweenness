@@ -34,8 +34,16 @@ for N = N_vec
             % _________________________________________________________________________
             % (b) ER:
             A_input = GenerateERfast(N,p,10);
+            % check connectivity
+            connect_flag = network_isconnected(A_input);
+            while ~connect_flag
+                A_input = GenerateERfast(N,p,10);
+                % check connectivity
+                connect_flag = network_isconnected(A_input);
+            end
+
             % 2. run simulations
-            [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_tree(A_input);
+            [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_ER(A_input);
             result(simu_time,:) = [L_add_output,L_ouput,L_comm_output,Norm_output];
         end
         filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f.txt",N,p);
@@ -47,7 +55,7 @@ end
 
 
 
-function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_tree(A_input)
+function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_ER(A_input)
     Input_Omega = EffectiveResitance_withinverseA(A_input);
     % Generate a demand matrix: the effective resistance matrix of the
     % input network
@@ -111,4 +119,12 @@ function A = GenerateERfast(n,p,weighted)
     end
     
     A = A + A';
+end
+
+
+function [isConnected] = network_isconnected(adj)
+    G = graph(adj);
+    components = conncomp(G);
+    % 判断图是否连通
+    isConnected = (max(components) == 1);
 end
