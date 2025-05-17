@@ -62,7 +62,7 @@ function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_
     % 3. The number of common links between two graphs
     L_comm_output_ratio = nnz(A_input.*output_Atilde)/nnz(output_Atilde); 
     % 4. The norm of common links between two graphs
-    Norm_output = sum(sum((D - output_Omega)./(D+(D==0))))/(N*(N-1));
+    Norm_output = sum(sum((abs(D - output_Omega))./(D+(D==0))))/(N*(N-1));
 end
 
 
