@@ -12,7 +12,7 @@ clear, clc
 % 6. update the \Omega
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
-N_vec = [10, 20, 50, 100];
+N_vec = [10, 20, 50, 100, 200];
 p_start_vec = zeros(4,1);
 count = 1; 
 for N = N_vec
@@ -25,7 +25,7 @@ count =1;
 for N = N_vec
     N
     result = zeros(simutimes,4);
-    p_vec = linspace(p_start_vec(count), 0.5, 12);
+    p_vec = linspace(p_start_vec(count), 1, 15);
     p_vec = round(p_vec,4);
     for p= p_vec
         p
