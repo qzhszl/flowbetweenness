@@ -17,13 +17,15 @@ function [output_Atilde,output_Omega] = IERP(D)
     W_tilde  = Input_Omega;
     W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);
     Omega_new = EffectiveResistance(W_tilde);            % Compute the effective resistance Omega
+    % OmegaDiff = round(D-Omega_new,10);
+    % diff_change = sum(sum(OmegaDiff));
     diff_change = sum(sum((abs(D - Omega_new))./(D+(D==0))))/(N*(N-1));
 
-    % val = 1;
+    val = 1;
     flag = 1;
     A = (W_tilde > 0);
-    % Gnow = graph(W_tilde,"upper");
-    while(flag==1)                     % Remove links one by one until we exceed the constraints                            
+    Gnow = graph(W_tilde,"upper");
+    while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remove links one by one until we exceed the constraints                            
         previous_change = diff_change;
         % method 1 R = A.*((Omega_new+eye(N)).^-1 - W_tilde)*(D-Omega_new) 
         R = A.*((Omega_new+eye(N)).^-1 - W_tilde).*(D-Omega_new);     % Compute R
@@ -32,9 +34,11 @@ function [output_Atilde,output_Omega] = IERP(D)
         A(row(1),col(1)) = 0; A(col(1),row(1)) = 0;        % Remove the link
         W_tilde = A.*D;
         W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);      % Compute W tilde
-        % Gnow = graph(W_tilde,"upper");
+        Gnow = graph(W_tilde,"upper");
         Omega_new = EffectiveResistance(W_tilde);               % Update the shortest path weight matrix
         
+        % OmegaDiff = round(D-Omega_new,10);                          
+        % diff_change = sum(sum(OmegaDiff));
         diff_change = sum(sum((abs(D - Omega_new))./(D+(D==0))))/(N*(N-1));
 
         if abs(diff_change) > abs(previous_change)
