@@ -13,6 +13,7 @@ clear, clc
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
 N_vec = [10, 20, 50, 100, 200];
+N_vec = [200];
 p_start_vec = zeros(4,1);
 count = 1; 
 for N = N_vec
@@ -30,6 +31,7 @@ for N = N_vec
     for p= p_vec
         p
         for simu_time = 1:simutimes
+            simu_time
             % 1. generate a graph
             % _________________________________________________________________________
             % (b) ER:
