@@ -18,7 +18,7 @@ for N = N_vec
     for p= p_vec
         filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f.txt",N,p);
         results = readmatrix(filename);
-        results = results(:,4);
+        results = results(:,3);
         mean_values = mean(results);
         std_values = std(results);
         data_mean(countp,countN) = mean_values;
@@ -45,16 +45,16 @@ end
 ax = gca;  % Get current axis
 ax.FontSize = 20;  % Set font size for tick label
 % xlim([0.01 0.55])
-ylim([0.05 0.25])
+% ylim([0.05 0.25])
 % xticks([1 2 3 4])
 % xticklabels({'10','20','50','100'})
 xlabel('$p$',Interpreter='latex',FontSize=24);
-ylabel('$\frac{N}{N(N-1)}\sum_i\sum_j\frac{|d_{ij}-\omega_{ij}|}{d_{ij}}$','interpreter','latex',FontSize=30)
-lgd = legend({'$N = 20$', '$N = 50$', '$N = 100$', '$N = 200$'}, 'interpreter','latex','Location', 'northwest',FontSize=30);
+ylabel('$\frac{L_c}{L_G}$','interpreter','latex',FontSize=30)
+lgd = legend({'$N = 20$', '$N = 50$', '$N = 100$', '$N = 200$'}, 'interpreter','latex','Location', 'southeast',FontSize=30);
 % lgd.NumColumns = 2;
 % set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
 box on
 hold off
 
-picname = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_ER_norm.pdf");
+picname = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_ER_commonlink.pdf");
 exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);

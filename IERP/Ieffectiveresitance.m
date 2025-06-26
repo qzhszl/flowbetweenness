@@ -64,8 +64,10 @@ val = 1;
 A = (W_tilde > 0);
 while(nnz(OmegaDiff<0)==0 && val > 0)                     % Remove links one by one until we exceed the constraints                            
     % method 1 R = A.*((Omega_new+eye(N)).^-1 - W_tilde)*(D-Omega_new)
+    % resistor = W_tilde;
     W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);
     R = A.*((Omega_new+eye(N)).^-1 - W_tilde).*(D-Omega_new);     % Compute R
+    % R = A.*((Omega_new+eye(N)).^-1 - W_tilde).*(D-Omega_new).*resistor;     % Compute R
     [val,~] = max(max(R));                              % Identify the maximum element
     [row,col] = find(R == val);                        % Identify the link
     A(row(1),col(1)) = 0; A(col(1),row(1)) = 0;        % Remove the link
