@@ -122,7 +122,7 @@ while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remo
     % R = A.*(D-Omega_new).*resistormatrix;     % Compute R
     
     ratio = 2 * printcount / (N * (N - 1));
-    if ratio <0.7 & N>500
+    if ratio <0.8 & N>500
         R_flat = R(:);
         % 找出 R 中最大的10个元素及其索引
         [~, idx] = maxk(R_flat, 100);
