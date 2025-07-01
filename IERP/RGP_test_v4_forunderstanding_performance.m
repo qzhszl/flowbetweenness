@@ -12,11 +12,6 @@ clear, clc
 % 6. update the \Omega
 % 7. repeat 2-6 until minimum Diff between i and j: Return lastly removed link
 
-
-% This.m is for understand for large dense network, if it is possible to
-% reducing the time complexity： yes it is
-
-
 % 1. generate a graph
 % (a) tree:
 % N = 10;
@@ -45,12 +40,7 @@ clear, clc
 %     6	0	0	0	0	0	0	0	3	0];
 
 % (b) ER network
-% A_input = [0	5	0	4	0	5
-% 5	0	0	5	0	2
-% 0	0	0	9	0	0
-% 4	5	9	0	5	8
-% 0	0	0	5	0	0
-% 5	2	0	8	0	0];
+
 % A_input = [0	7	4	9	7	0	0	0	7	2	7	1	8	8	1	8	10	0	6	0
 % 7	0	0	2	9	1	0	0	6	0	0	8	2	6	5	7	3	0	0	0
 % 4	0	0	8	0	0	2	9	10	0	8	7	0	4	9	0	3	0	4	9
@@ -72,37 +62,49 @@ clear, clc
 % 6	0	4	8	0	0	0	7	0	10	0	5	0	5	4	0	5	8	0	0
 % 0	0	9	0	0	2	1	0	0	0	10	0	0	8	5	6	8	0	0	0];
 
-% N = 1000;
-% A_input = GenerateERfast(N,0.5,10)
-% T = graph(A_input);
 
+A_input = [0	5	6	4	0	5
+5	0	2	5	0	2
+6	2	0	9	1	0
+4	5	9	0	5	8
+0	0	1	5	0	7
+5	2	0	8	7	0];
 
-% BA network
-N = 1000;
-filename = 'D:\\data\\flow betweenness\\BAnetworks\\BAnetworkN1000m2.txt';
-data = readmatrix(filename);
-
-% 拆分数据
-sources = data(:,1);
-sources = sources+1;
-targets = data(:,2);
-targets = targets+1;
-weights = data(:,3);
-
-% 构建带权无向图
-G = graph(sources, targets, weights);
-A_input  = full(adjacency(G,"weighted"));
-
+N = 6;
+% p_vec = [0.230300000000000	0.285300000000000	0.340300000000000	0.395200000000000	0.450200000000000	0.505200000000000	0.560200000000000	0.615200000000000	0.670100000000000	0.725100000000000	0.780100000000000	0.835100000000000	0.890000000000000	0.945000000000000	1];
+% p_vec = [0.3,0.5,0.7,1]
+% p = p_vec(2)
+% A_input = GenerateERfast(N,p,10);
+% connect_flag = network_isconnected(A_input);
+% while ~connect_flag
+%     A_input = GenerateERfast(N,p,10);
+%     % check connectivity
+%     connect_flag = network_isconnected(A_input);
+% end
+T = graph(A_input);
 tic
-% subplot(1,2,1)
+x = [1.58686899122221	0.0929655959789753	-1.49846325197180	1.49829944222465	-1.58675127703166	-0.0929195004223767]
+y = [0.807381268842876	1.78923304823087	0.977558685208435	-0.977454315917245	-0.807370212196296	-1.78934847416864]
+subplot(2,2,1)
+h1 = plot(T,'EdgeLabel',T.Edges.Weight,'XData', x, 'YData', y,'NodeColor',[0.8500 0.3250 0.0980], ...
+'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
+
 % h1 = plot(T,'EdgeLabel',T.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
 % 'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
-% x = h1.XData;
-% y = h1.YData;
-% D = distances(T);
+
+x = h1.XData;
+y = h1.YData;
+
 Aforomega = A_input;
 Aforomega(Aforomega ~= 0) = 1 ./ Aforomega(Aforomega ~= 0);
 Omega = EffectiveResistance(Aforomega);
+
+subplot(2,2,3)
+G_omega = graph(Omega,'upper');
+h3 = plot(G_omega,'EdgeLabel',G_omega.Edges.Weight,'XData', x, 'YData', y,'NodeColor',[0.8500 0.3250 0.0980], ...
+'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
+
+
 % Generate a demand matrix
 D = Omega;
 
@@ -117,7 +119,7 @@ flag = 1;
 A = (W_tilde > 0);
 Gnow = graph(W_tilde,"upper");
 % resistormatrix = W_tilde;
-printcount = 0
+printcount = 1
 
 while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remove links one by one until we exceed the constraints                            
     previous_change = diff_change;
@@ -127,7 +129,7 @@ while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remo
     % R = A.*(D-Omega_new).*resistormatrix;     % Compute R
     
     ratio = 2 * printcount / (N * (N - 1));
-    if ratio <0.95 & N>500
+    if ratio <0.9 & N>500
         R_flat = R(:);
         % 找出 R 中最大的10个元素及其索引
         [~, idx] = maxk(R_flat, 100);
@@ -149,14 +151,12 @@ while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remo
         Omega_new = EffectiveResistance(W_tilde);               % Update the shortest path weight matrix
                                 
         diff_change = sum(sum((abs(D - Omega_new))./(D+(D==0))))/(N*(N-1));
-        
+
         fprintf('diff_change: %.8f\n', diff_change);
         if abs(diff_change) > abs(previous_change)
             flag=0;
         end
-        printcount = printcount+ 100
-        0.5*(nnz(A))
-        
+        printcount = printcount+ 100;
     else
         [val,~] = max(max(R));                              % Identify the maximum element
         [row,col] = find(R == val);                        % Identify the link
@@ -176,7 +176,7 @@ while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remo
         printcount = printcount+ 1;
     end
 
-    if mod(printcount, 1000) == 0
+    if mod(printcount, 1000) == 1
         ratio = 2 * printcount / (N * (N - 1));
         fprintf('Progress: %.2f%%\n', ratio * 100);
     end
@@ -209,10 +209,15 @@ L_comm_OLR = nnz(A_input.*A_OLR)/nnz(A_input);
 Norm_OLR = sum(sum((abs(D - final_result))./(D+(D==0))))/(N*(N-1))
 
 G_OLR = graph(W,"upper");
-% subplot(1,2,2)
-% h2 = plot(G_OLR,'EdgeLabel',G_OLR.Edges.Weight,'XData', x, 'YData', y,'NodeColor',[0.8500 0.3250 0.0980], ...
-% 'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
+subplot(2,2,2)
+h2 = plot(G_OLR,'EdgeLabel',G_OLR.Edges.Weight,'XData', x, 'YData', y,'NodeColor',[0.8500 0.3250 0.0980], ...
+'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
+title(['diff = ', num2str(Norm_OLR, '%.4f')])
 
+subplot(2,2,4)
+G_omega_2 = graph(final_result,'upper');
+h4 = plot(G_omega_2,'EdgeLabel',G_omega_2.Edges.Weight,'XData', x, 'YData', y,'NodeColor',[0.8500 0.3250 0.0980], ...
+'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
 
 
 
@@ -280,4 +285,11 @@ function A = GenerateERfast(n,p,weighted)
     end
     
     A = A + A';
+end
+
+function [isConnected] = network_isconnected(adj)
+    G = graph(adj);
+    components = conncomp(G);
+    % 判断图是否连通
+    isConnected = (max(components) == 1);
 end

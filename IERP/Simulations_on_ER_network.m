@@ -13,7 +13,7 @@ clear, clc
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
 N_vec = [10, 20, 50, 100, 200];
-N_vec = [200];
+N_vec = [10];
 p_start_vec = zeros(4,1);
 count = 1; 
 for N = N_vec
@@ -48,7 +48,7 @@ for N = N_vec
             [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_ER(A_input);
             result(simu_time,:) = [L_add_output,L_ouput,L_comm_output,Norm_output];
         end
-        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f.txt",N,p);
+        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_weight01.txt",N,p);
         writematrix(result,filename)
     end
     count = count+1;

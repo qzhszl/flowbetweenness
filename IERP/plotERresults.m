@@ -1,5 +1,6 @@
 clear,clc
-N_vec = [20, 50, 100, 200];
+N_vec = [10, 20, 50, 100, 200];
+N_vec = [10];
 p_start_vec = zeros(length(N_vec),1);
 countN = 1; 
 for N = N_vec
@@ -16,7 +17,7 @@ for N = N_vec
     p_vec = round(p_vec,4);
     countp = 1;
     for p= p_vec
-        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f.txt",N,p);
+        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_weight01.txt",N,p);
         results = readmatrix(filename);
         results = results(:,4);
         mean_values = mean(results);
@@ -56,5 +57,5 @@ lgd = legend({'$N = 20$', '$N = 50$', '$N = 100$', '$N = 200$'}, 'interpreter','
 box on
 hold off
 
-picname = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_ER_norm.pdf");
-exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
+% picname = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_ER_norm.pdf");
+% exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
