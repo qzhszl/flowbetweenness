@@ -130,7 +130,7 @@ while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remo
     if ratio <0.95 & N>500
         R_flat = R(:);
         % 找出 R 中最大的10个元素及其索引
-        [~, idx] = maxk(R_flat, 100);
+        [~, idx] = maxk(R_flat, 200);
         
         % 将线性索引转换为行列索引
         [row_idx, col_idx] = ind2sub(size(R), idx);
@@ -154,8 +154,7 @@ while(flag==1 && val > 0 && all(conncomp(Gnow) == 1))                     % Remo
         if abs(diff_change) > abs(previous_change)
             flag=0;
         end
-        printcount = printcount+ 100
-        0.5*(nnz(A))
+        printcount = printcount+ 100;
         
     else
         [val,~] = max(max(R));                              % Identify the maximum element
