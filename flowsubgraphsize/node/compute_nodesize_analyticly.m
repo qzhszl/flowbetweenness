@@ -1,4 +1,6 @@
 clear,clc
+% the simulation results should be not in the largest LCC
+
 N = 100;
 
 pc= log(N)/N
