@@ -21,24 +21,39 @@ pc= log(N)/N
 % title(sprintf('s vs p for ER random graph (N = %d)', N))
 % grid on
 n = 100
-p = 0.5
-k = n-1
-% f1= @(x) x
-f2 = @(x) x-(1 - (1 - p * x)^(k - 1) - x .* (1 - x) .* (k - 1) .* p .* (1 - p * x).^(k - 2));
+% p = 0.5
+% k = n-1
+% % f1= @(x) x
+% f2 = @(x) x-(1 - (1 - p * x)^(k - 1) - x .* (1 - x) .* (k - 1) .* p .* (1 - p * x).^(k - 2));
+% 
+% p_vals = linspace(0.001, 1, 2000);
+% % x_vals = arrayfun(f1, p_vals);
+% s_vals = arrayfun(f2, p_vals);
+% 
+% % plot(p_vals, x_vals, 'b', 'LineWidth', 2); hold on;
+% plot(p_vals, s_vals, 'r--', 'LineWidth', 2);
+% legend('x(p)', 's(p)');
+% xlabel('p');
+% ylabel('Function value');
+% title('x(p) and s(p) from ER Random Graph');
 
-p_vals = linspace(0.001, 1, 2000);
-% x_vals = arrayfun(f1, p_vals);
-s_vals = arrayfun(f2, p_vals);
-
-% plot(p_vals, x_vals, 'b', 'LineWidth', 2); hold on;
-plot(p_vals, s_vals, 'r--', 'LineWidth', 2);
-legend('x(p)', 's(p)');
-xlabel('p');
-ylabel('Function value');
-title('x(p) and s(p) from ER Random Graph');
-
-x = obtain_pstar(N, p)
-
+ave_degree = 1:0.1:4.9;
+ave_degree_2 = 5:10;
+ave_degree = [ave_degree,ave_degree_2];
+p_vals = ave_degree/(N-1);
+y_vec =zeros(length(p_vals),1);
+i=1;
+for p = p_vals
+    x = obtain_pstar(N, p);
+    if length(x)>1
+        x = x(2);
+    else
+        x = x(1);
+    end
+    y_vec(i) = x;
+    i = i+1;
+end
+plot(ave_degree,y_vec)
 
 function x = obtain_pstar(N, p)
 % obtain_pstar: 
