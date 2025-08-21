@@ -5,7 +5,7 @@ function roots = find_all_roots(f, a, b, N)
 % N : 网格点数量（越大越精细，默认10000）
 
     if nargin < 4
-        N = 10000;
+        N = 100000;
     end
 
     x_grid = linspace(a, b, N);
