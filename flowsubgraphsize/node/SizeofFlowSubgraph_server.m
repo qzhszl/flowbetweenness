@@ -1,6 +1,6 @@
 function SizeofFlowSubgraph_server(inputpara)
     rng(inputpara*10)
-    N = 100000;
+    N = 10000;
 %     pc= log(N)/N;
     ave_degree = 1:0.1:4.9;
     ave_degree_2 = 5:10;
@@ -92,7 +92,7 @@ function SizeofFlowSubgraph_server(inputpara)
     filename_real_ave_degree = sprintf("real_ave_degree_N%d_simu%d.txt",N,inputpara);
     writematrix(real_ave_degree_mat,filename_real_ave_degree)
     filename_linknum = sprintf("linknum_N%d_simu%d.txt",N,inputpara);
-    writematrix(flow_subgraph_linksize_mat,filename_linknum)
+    writematrix(Linknum_mat,filename_linknum)
 
 
     matfilename = sprintf("prob_anodein_fsg_withdiff_p_simu%d.txt",N,inputpara);
