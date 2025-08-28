@@ -1,15 +1,6 @@
 clear,clc
 % plot the relation between the flow subgraph node size with the real ave degree
-N = 10000
-
-avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
-% avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
-result_table = readtable(avefsg_size_filename);
-plot(result_table.avg,result_table.Mean/N)
-hold on
-
-% p_vals = result_table.avg/(N-1);
-% s_vals = zeros(size(p_vals));
+N = 100
 avg = 0:0.1:8;
 p_vals = avg/(N-1);
 s_vals = zeros(size(p_vals));
@@ -17,23 +8,33 @@ for i = 1:length(p_vals)
     s_vals(i) = compute_s_from_ER(N, p_vals(i));
 end
 plot(avg, s_vals, 'LineWidth', 2)
-
-
-N = 1000
-
-avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
-% avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
-result_table = readtable(avefsg_size_filename);
-plot(result_table.avg,result_table.Mean/N)
 hold on
 
-N = 100
-
-avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
+% N = 10000
 % avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
-result_table = readtable(avefsg_size_filename);
-plot(result_table.avg,result_table.Mean/N)
-hold on
+% % avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
+% result_table = readtable(avefsg_size_filename);
+% plot(result_table.avg,result_table.Mean/N)
+% hold on
+% 
+% % p_vals = result_table.avg/(N-1);
+% % s_vals = zeros(size(p_vals));
+% 
+% N = 1000
+% 
+% avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
+% % avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
+% result_table = readtable(avefsg_size_filename);
+% plot(result_table.avg,result_table.Mean/N)
+% hold on
+% 
+% N = 100
+% 
+% avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
+% % avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
+% result_table = readtable(avefsg_size_filename);
+% plot(result_table.avg,result_table.Mean/N)
+% hold on
 
 
 x = [1	1.10000000000000	1.20000000000000	1.30000000000000	1.40000000000000	1.50000000000000	1.60000000000000	1.70000000000000	1.80000000000000	1.90000000000000	2	2.10000000000000	2.20000000000000	2.30000000000000	2.40000000000000	2.50000000000000	2.60000000000000	2.70000000000000	2.80000000000000	2.90000000000000	3	3.10000000000000	3.20000000000000	3.30000000000000	3.40000000000000	3.50000000000000	3.60000000000000	3.70000000000000	3.80000000000000	3.90000000000000	4	4.10000000000000	4.20000000000000	4.30000000000000	4.40000000000000	4.50000000000000	4.60000000000000	4.70000000000000	4.80000000000000	4.90000000000000	5	6	7	8	9	10
@@ -88,7 +89,7 @@ y = [0.5012
 
 plot(x,y/100)
 hold on
-lgd=legend("10000","ana","1000","100","100_2")
+lgd=legend("ana","10000","1000","100","100_2")
 
 
 % for large network
