@@ -7,6 +7,7 @@ s_vals = zeros(size(p_vals));
 for i = 1:length(p_vals)
     s_vals(i) = compute_s_from_ER(N, p_vals(i));
 end
+% s_vals = s_vals.^1.5
 plot(avg, s_vals, 'LineWidth', 2)
 hold on
 

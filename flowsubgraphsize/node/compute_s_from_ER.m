@@ -23,4 +23,6 @@ function s = compute_s_from_ER(N, p)
 
     % 第三步：代入表达式计算 s
     s = 1 - phi - x * phi_prime;
+    % try new
+    s = x^2*s;
 end
