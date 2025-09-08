@@ -22,7 +22,7 @@ clear,clc
 
 for N = 10
     for p=[0.5]
-        compute_power_dissipation_eachlink(N,p,2)
+        compute_power_dissipation_eachlink(N,p,1)
     end
 end
 

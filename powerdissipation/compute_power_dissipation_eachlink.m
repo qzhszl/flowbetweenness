@@ -24,25 +24,25 @@ for k = 1:simu_times
     % ---- 生成 ER 图 ----
     A =  GenerateERfast(n,p,1);
     G = graph(A);  % 无向图
-%     figure;
-%     plot(G,'EdgeLabel',G.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
-% 'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
+    figure;
+    plot(G,'EdgeLabel',G.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
+'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
 
     % 随机生成边权重 (导纳)，避免 0 权
     
     % G_path 的边权重 = 1/g
     % figure;
-    G_path = graph(G.Edges.EndNodes(:,1), G.Edges.EndNodes(:,2), 1./G.Edges.Weight);
+    G_path = graph(G.Edges.EndNodes(:,1), G.Edges.EndNodes(:,2), 1./G.Edges.Weight,numnodes(G));
 %     plot(G_path,'EdgeLabel',G_path.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
 % 'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
 
     % ---- 对所有节点对 (i,j) 计算 ----
     n = numnodes(G);
-    total_SP   = zeros(k,1);   
-    total_Flow = zeros(k,1);
+    total_SP   = zeros(nchoosek(n,2),1);   
+    total_Flow = zeros(nchoosek(n,2),1);
     linkP_SP = zeros(numedges(G),1);
     linkP_Flow = zeros(numedges(G),1);
-    count = 1;
+    count = 0;
     for s = 1:n
         for t = (s+1):n
             count = count+1;

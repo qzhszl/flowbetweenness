@@ -8,19 +8,19 @@ filename = filefolder_name+resname;
 
 % load_and_plot_nodeCFB.m
 S = load(filename);
-results = S.results
+results = S.results;
 
 % % 2. 拼接所有实验的 nodeCFB
-% allNodeCFB = [];
-% for r = 1:numel(results)
-%     allNodeCFB = [allNodeCFB; results(r).nodeCFB(:)];
-% end
-% 
-% 
-% % alllinkCFB = [];
-% % for r = 1:numel(results)
-% %     alllinkCFB = [alllinkCFB; results(r).edgeCFB(:)];
-% % end
+total_energy_path = [];
+for r = 1:numel(results)
+    total_energy_path = [total_energy_path; results(r).total_SP(:)];
+end
+
+
+total_energy_flow = [];
+for r = 1:numel(results)
+    total_energy_flow = [total_energy_flow; results(r).total_Flow(:)];
+end
 % 
 % allnodeSPB = [];
 % for r = 1:numel(results)
@@ -34,15 +34,15 @@ results = S.results
 % 
 % 
 % % 3. 画直方图 (分布图)
-% figure;
-% histogram(allNodeCFB, 50, 'Normalization', 'pdf'); % 50 bins
+figure;
+histogram(total_energy_path, 30, 'Normalization', 'pdf'); % 50 bins
 % set(gca,"YScale", "log")
-% hold on
-% 
-% histogram(allnodeSPB, 50, 'Normalization', 'pdf'); % 50 bins
-% 
-% ylabel('$f_b(x)$','interpreter','latex','FontSize',30)
-% xlabel('$x$','interpreter','latex','FontSize',30);
+hold on
+
+histogram(total_energy_flow, 30, 'Normalization', 'pdf'); % 50 bins
+
+ylabel('$f_b(x)$','interpreter','latex','FontSize',30)
+xlabel('$x$','interpreter','latex','FontSize',30);
 % 
 % 
 % 
