@@ -1,8 +1,8 @@
 clear,clc
 filefolder_name = "D:\\data\\flow betweenness\\";
 
-N = 100;
-p = 0.05;
+N = 50;
+p = 0.2;
 resname  = sprintf('bet_cbet_degree_N%dp%.2fER.mat',N,p);
 filename = filefolder_name+resname;
 
