@@ -24,9 +24,9 @@ for k = 1:simu_times
     % ---- 生成 ER 图 ----
     A =  GenerateERfast(n,p,1);
     G = graph(A);  % 无向图
-    figure;
-    plot(G,'EdgeLabel',G.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
-'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
+%     figure;
+%     plot(G,'EdgeLabel',G.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
+% 'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
 
     % 随机生成边权重 (导纳)，避免 0 权
     
