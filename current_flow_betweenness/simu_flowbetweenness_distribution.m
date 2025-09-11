@@ -20,9 +20,9 @@ for r = 1:R
     if strcmp(model,'ER')
         % Step 1: Generate a connected network
         ind_conn = 1;
-        A = GenerateERfast(N,p,1);
+        A = GenerateERfast(N,p,0);
         while(ind_conn) % Until a connected graph is created
-            A = GenerateERfast(N,p,1);       
+            A = GenerateERfast(N,p,0);       
             G = graph(A);
             if(sum(conncomp(G)) == N)
                 ind_conn = 0;
@@ -72,7 +72,7 @@ for r = 1:R
     results(r).deg = degree_unweighted;
     results(r).wdeg = degree_weighted;
 end
-filename = sprintf('bet_cbet_degree_N%dp%.2fER.mat',N,p)
+filename = sprintf('bet_cbet_degree_N%dp%.2fER_unweighted.mat',N,p)
 % 保存到文件
 save(filefolder_name+filename,'results');
 disp("mission_completed")

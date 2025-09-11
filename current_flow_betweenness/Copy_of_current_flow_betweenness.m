@@ -52,16 +52,12 @@ end
 
 % Build Laplacian L = D - A
 deg = sum(A,2);
-if issparse(A)
-    L = spdiags(deg, 0, size(A,1), size(A,2)) - A;
-else
-    L = diag(deg) - A;
-end
+L = diag(deg) - A;
 
 % Compute Moore-Penrose pseudoinverse Lplus of L via spectral decomposition
 % (more stable than pinv for Laplacian singularity)
 % opts.disp = 0;
-[V, D] = eig(full(L));
+[V, D] = eig(L);
 d = diag(D);
 % numerical threshold
 tol = max(n * eps(max(d)), 1e-12);
