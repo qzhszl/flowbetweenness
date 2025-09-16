@@ -1,12 +1,12 @@
 clear,clc
 filefolder_name = "D:\\data\\flow betweenness\\";
 
-n = 10;
-p = 0.5;
+n = 100;
+p = 0.2;
 resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
 filename = filefolder_name+resname;
 
-% load_and_plot_nodeCFB.m
+% load_and_plot_powerdissipation.m
 S = load(filename);
 results = S.results;
 
