@@ -23,41 +23,67 @@ for r = 1:numel(results)
 end
 
 
-% % 3. Figure. 1 plot the distribution of total energy 
-figure;
-histogram(total_energy_path, 30, 'Normalization', 'pdf'); % 50 bins
-% set(gca,"YScale", "log")
-hold on
-
-histogram(total_energy_flow, 30, 'Normalization', 'pdf'); % 50 bins
-
-ylabel('$f_e(x)$','interpreter','latex','FontSize',30)
-xlabel('$x$','interpreter','latex','FontSize',30);
+% % % 3. Figure. 1 plot the distribution of total energy 
+% figure;
+% histogram(total_energy_path, 30, 'Normalization', 'pdf'); % 50 bins
+% % set(gca,"YScale", "log")
+% hold on
+% 
+% histogram(total_energy_flow, 30, 'Normalization', 'pdf'); % 50 bins
+% 
+% ylabel('$f_e(x)$','interpreter','latex','FontSize',30)
+% xlabel('$x$','interpreter','latex','FontSize',30);
 
 
 
 % % 2. load power dissipation for each link
-total_link_energy_path = [];
+link_energy_path = [];
 for r = 1:numel(results)
-    total_link_energy_path = [total_link_energy_path; results(r).linkP_SP(:)];
+    link_energy_path = [link_energy_path; results(r).linkP_SP(:)];
 end
+link_energy_path = link_energy_path./nchoosek(n,2);
 
-
-total_link_energy_flow = [];
+link_energy_flow = [];
 for r = 1:numel(results)
-    total_link_energy_flow = [total_link_energy_flow; results(r).linkP_Flow(:)];
+    link_energy_flow = [link_energy_flow; results(r).linkP_Flow(:)];
 end
+link_energy_flow = link_energy_flow./nchoosek(n,2);
 
 % % 3. 画直方图 (分布图)
-figure;
-histogram(total_link_energy_path, 60, 'Normalization', 'pdf'); % 50 bins
-% set(gca,"YScale", "log")
-hold on
+fig = figure; 
+fig.Position = [100 100 900 600]; 
+colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 
-histogram(total_link_energy_flow, 60, 'Normalization', 'pdf'); % 50 bins
+histogram(total_energy_flow, 60, 'Normalization', 'pdf'); % 50 bins
+% hold on
+
+% histogram(link_energy_flow, 100, 'Normalization', 'pdf'); % 50 bins
+
+% set(gca,"XScale", "log")
+% set(gca,"YScale", "log")
 
 ylabel('$f_e(x)$','interpreter','latex','FontSize',30)
 xlabel('$x$','interpreter','latex','FontSize',30);
+
+
+ax = gca;  % Get current axis
+ax.FontSize = 20;  % Set font size for tick label
+% xlim([0.01 0.55])
+% ylim([0.05 0.25])
+% xticks([1 2 3 4])
+% xticklabels({'10','20','50','100'})
+% lgd = legend({'$N = 20$', '$N = 50$', '$N = 100$', '$N = 200$'}, 'interpreter','latex','Location', 'northwest',FontSize=30);
+% lgd.NumColumns = 2;
+% set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
+box on
+% set(fig, 'Color', 'none');              % figure 背景透明
+% set(gca,  'Color', 'none');             % 坐标轴区域背景透明
+hold off
+
+picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_N%d_p%.2f.pdf",n,p);
+% exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
+print(fig, picname, '-dpdf', '-r600', '-bestfit');
+
 
 
 
