@@ -2,7 +2,7 @@ clear,clc
 filefolder_name = "D:\\data\\flow betweenness\\";
 
 n = 100;
-p = 0.1;
+p = 0.2;
 resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
 filename = filefolder_name+resname;
 
@@ -57,10 +57,11 @@ colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 % histogram(link_energy_path, 60, 'Normalization', 'pdf', FaceColor='#D08082'); % 50 bins
 % hold on
 
-histogram(link_energy_flow, 60, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
+h = histogram(link_energy_flow, 60, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
+hold on
 
 % set(gca,"XScale", "log")
-set(gca,"YScale", "log")
+% set(gca,"YScale", "log")
 
 ylabel('$f_{E_l}(x)$','interpreter','latex','FontSize',30)
 xlabel('$x$','interpreter','latex','FontSize',30);
@@ -84,6 +85,42 @@ picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_dis
 % exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
 print(fig, picname, '-dpdf', '-r600', '-bestfit');
 
+function gamma_curve_fit
+x  =h.BinEdges
+y = h.Values
+y  = y(1:40)
+x = x(2:41)
 
+plot(x, y, 'o',"Color","black"); 
+xdata = x(:);
+ydata = y(:);
+plot(x, y, 'o',"Color","black"); 
+hold on
+% plot(xdata, ydata, 'o'); hold on
+% 定义 Gamma PDF 模型: b(1)=shape, b(2)=scale
+gammaFun = @(b,x) gampdf(x, b(1), b(2));
+
+% 初始猜测
+b0 = [1, 1];
+
+% 约束边界，确保参数合法
+lb = [1e-6, 1e-6];   % 下界：避免为0或负数
+ub = [Inf, Inf];     % 上界：无穷大
+
+% 拟合
+opts = optimset('Display','off');  % 不输出迭代信息
+beta = lsqcurvefit(gammaFun, b0, xdata, ydata, lb, ub, opts);
+
+shape = beta(1);
+scale = beta(2);
+
+% 绘图看结果
+xplot = linspace(min(xdata), max(xdata), 300);
+yfit = gampdf(xplot, shape, scale);
+
+
+plot(xplot, yfit, '-r', 'LineWidth', 2);
+title(sprintf('shape=%.3f, scale=%.3f', shape, scale));
+end
 
 
