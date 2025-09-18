@@ -2,7 +2,7 @@ clear,clc
 filefolder_name = "D:\\data\\flow betweenness\\";
 
 n = 100;
-p = 0.2;
+p = 0.1;
 resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
 filename = filefolder_name+resname;
 
@@ -54,15 +54,15 @@ fig = figure;
 fig.Position = [100 100 900 600]; 
 colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 
-histogram(total_energy_flow, 60, 'Normalization', 'pdf'); % 50 bins
+% histogram(link_energy_path, 60, 'Normalization', 'pdf', FaceColor='#D08082'); % 50 bins
 % hold on
 
-% histogram(link_energy_flow, 100, 'Normalization', 'pdf'); % 50 bins
+histogram(link_energy_flow, 60, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
 
 % set(gca,"XScale", "log")
-% set(gca,"YScale", "log")
+set(gca,"YScale", "log")
 
-ylabel('$f_e(x)$','interpreter','latex','FontSize',30)
+ylabel('$f_{E_l}(x)$','interpreter','latex','FontSize',30)
 xlabel('$x$','interpreter','latex','FontSize',30);
 
 
