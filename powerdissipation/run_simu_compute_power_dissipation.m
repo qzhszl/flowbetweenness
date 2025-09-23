@@ -20,8 +20,9 @@ clear,clc
 % EdgeEnergy_SP = addvars(G.Edges, EdgeEnergy_SP, 'NewVariableNames',"Energy_SP")
 
 
-for N = 50
-    for p=[0.08,0.1,0.2,0.5]
+for N = 200
+    % for p=[0.15,0.28,0.39,0.66,0.88]
+    for p=[0.88]
         compute_power_dissipation_eachlink(N,p,100)
     end
 end

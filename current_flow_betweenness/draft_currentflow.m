@@ -28,7 +28,7 @@ clear,clc
 % set(gca,"YScale", "log")
 % set(gca,"XScale", "log")
 
-A = GenerateERfast(1000,0.05,100);
+A = GenerateERfast(1000,0.05,0);
 n = 1000;
 % 度矩阵与拉普拉斯
 deg = sum(A,2);
@@ -65,7 +65,7 @@ end
 vals = Lplus(:);
 
 figure('Color','w','Units','normalized','Position',[0.2 0.2 0.5 0.5]);
-histogram(vals, 80, 'Normalization', 'pdf'); % 80 个 bin
+histogram(vals, 100, 'Normalization', 'pdf'); % 80 个 bin
 xlabel('Elements of L^+');
 ylabel('Probability density');
 title('Histogram of all elements in Laplacian pseudoinverse (L^+)');
@@ -86,8 +86,10 @@ fprintf('Std  of L^+ elements: %.6e\n', sigma);
 
 % 如果想看对角/非对角元素分布，可以另外绘制：
 figure('Color','w','Units','normalized','Position',[0.2 0.1 0.5 0.35]);
-histogram(diag(Lplus), 50, 'Normalization','pdf');
-xlabel('Diagonal elements of L^+');
+histogram(triu(Lplus), 50, 'Normalization','pdf');
+% xscale("log")
+yscale("log")
+xlabel('upper triangle elements of L^+');
 ylabel('Density');
-title('Histogram of diagonal elements of L^+');
+title('upper triangle elements of L^+');
 

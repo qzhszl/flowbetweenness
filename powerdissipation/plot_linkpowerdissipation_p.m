@@ -1,15 +1,17 @@
 clear,clc
 filefolder_name = "D:\\data\\flow betweenness\\";
 
-n = 100;
-p_vec = [0.05,0.1,0.2,0.5];
+n = 20;
+p_vec = [0.08,0.1,0.15,0.2,0.28,0.39,0.5,0.66];
+p_vec=[0.15,0.28,0.39,0.66,0.88]
+% p_vec = [0.05,0.1,0.2,0.5]
 ave_link_power_vec = zeros(length(p_vec),1);
 std_link_power_vec = zeros(length(p_vec),1);
 
 count = 0;
 for p = p_vec
     count = count+1;
-    resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
+    resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
     filename = filefolder_name+resname;
     
     % load_and_plot_powerdissipation.m
@@ -53,6 +55,23 @@ colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 
 % errorbar(p_vec,ave_link_power_vec,std_link_power_vec,"-o",'LineWidth', 4, 'MarkerSize', 12,color = "#D08082")
 plot(p_vec,ave_link_power_vec,"-o",'LineWidth', 4, 'MarkerSize', 12,color = "#D08082")
+hold on
+
+% curve fit................
+xdata = p_vec(:);
+ydata = ave_link_power_vec(:);
+% 定义幂律拟合模型：y = a*x^b
+X = log(xdata(3:length(xdata)));
+Y = log(ydata(3:length(xdata)));
+
+coeff = polyfit(X, Y, 1);   % 拟合直线 Y = b*X + log(a)
+
+b = coeff(1);
+loga = coeff(2);
+a = exp(loga);
+
+plot(xdata, a*xdata.^b, '--','Color','#7A7DB1','LineWidth',5)
+
 
 set(gca,"XScale", "log")
 set(gca,"YScale", "log")
@@ -67,7 +86,7 @@ ax.FontSize = 20;  % Set font size for tick label
 % ylim([0.05 0.25])
 % xticks([1 2 3 4])
 % xticklabels({'10','20','50','100'})
-% lgd = legend({'$N = 20$', '$N = 50$', '$N = 100$', '$N = 200$'}, 'interpreter','latex','Location', 'northwest',FontSize=30);
+lgd = legend({'link power dissipation', sprintf('fit: $y = %.2g x^{%.3g}$', a, b)}, 'interpreter','latex','Location', 'best',FontSize=30);
 % lgd.NumColumns = 2;
 % set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
 box on
