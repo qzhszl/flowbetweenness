@@ -27,9 +27,15 @@ clear,clc
 % plot(k,P,"o")
 % set(gca,"YScale", "log")
 % set(gca,"XScale", "log")
+avg = 20;
 
-A = GenerateERfast(1000,0.05,0);
+target_mean = 2/avg
+target_std = sqrt(2/(avg^3))
+
 n = 1000;
+p = avg/(1000-1)
+A = GenerateERfast(n,p,0);
+
 % 度矩阵与拉普拉斯
 deg = sum(A,2);
 D = diag(deg);
@@ -61,35 +67,69 @@ end
 % disp(norm(Lplus - Lplus', 'fro'));  % 应该接近 0
 % disp(norm(L * Lplus * L - L, 'fro')); % Moore-Penrose 条件之一, 应接近 0
 
-% 展平所有元素并画 histogram
-vals = Lplus(:);
+Reff = zeros(n);
+for i = 1:n
+    for j = i+1:n
+        Reff(i,j) = Lplus(i,i) + Lplus(j,j) - 2*Lplus(i,j);
+        Reff(j,i) = Reff(i,j); % 对称
+    end
+end
 
-figure('Color','w','Units','normalized','Position',[0.2 0.2 0.5 0.5]);
-histogram(vals, 100, 'Normalization', 'pdf'); % 80 个 bin
-xlabel('Elements of L^+');
-ylabel('Probability density');
-title('Histogram of all elements in Laplacian pseudoinverse (L^+)');
+resistances = Reff(triu(true(n),1));
 
-% 在图上标注均值和标准差
-mu = mean(vals);
-sigma = std(vals);
-yl = ylim;
+% 1. 拟合正态分布
+mu = mean(resistances);
+sigma = std(resistances);
+
+% 或者用 fitdist 更正规：
+pd = fitdist(resistances, 'Normal');
+mu = pd.mu;
+sigma = pd.sigma;
+
+% 2. 画直方图
+figure;
+histogram(resistances, 30, 'Normalization', 'pdf'); % 归一化成概率密度
 hold on;
-plot([mu mu], yl, '--k', 'LineWidth',1.5);
-text(mu, yl(2)*0.9, sprintf('\\leftarrow mean=%.3e', mu), 'FontSize',10);
+
+% 3. 画拟合的正态分布曲线
+x = linspace(min(resistances), max(resistances), 200);
+y = normpdf(x, mu, sigma);
+plot(x, y, 'r-', 'LineWidth', 2);
+
+xlabel('Effective Resistance');
+ylabel('Probability Density');
+title(sprintf('Normal Fit: \\mu = %.3f, \\sigma = %.3f', mu, sigma));
+legend('Empirical Distribution', 'Normal Fit');
 hold off;
-
-% 输出一些数值信息
-fprintf('Number of zero (<= tol) eigenvalues: %d\n', sum(eigvals <= tol));
-fprintf('Mean of L^+ elements: %.6e\n', mu);
-fprintf('Std  of L^+ elements: %.6e\n', sigma);
-
-% 如果想看对角/非对角元素分布，可以另外绘制：
-figure('Color','w','Units','normalized','Position',[0.2 0.1 0.5 0.35]);
-histogram(triu(Lplus), 50, 'Normalization','pdf');
-% xscale("log")
-yscale("log")
-xlabel('upper triangle elements of L^+');
-ylabel('Density');
-title('upper triangle elements of L^+');
+% 展平所有元素并画 histogram
+% vals = Lplus(:);
+% 
+% figure('Color','w','Units','normalized','Position',[0.2 0.2 0.5 0.5]);
+% histogram(vals, 100, 'Normalization', 'pdf'); % 80 个 bin
+% xlabel('Elements of L^+');
+% ylabel('Probability density');
+% title('Histogram of all elements in Laplacian pseudoinverse (L^+)');
+% 
+% % 在图上标注均值和标准差
+% mu = mean(vals);
+% sigma = std(vals);
+% yl = ylim;
+% hold on;
+% plot([mu mu], yl, '--k', 'LineWidth',1.5);
+% text(mu, yl(2)*0.9, sprintf('\\leftarrow mean=%.3e', mu), 'FontSize',10);
+% hold off;
+% 
+% % 输出一些数值信息
+% fprintf('Number of zero (<= tol) eigenvalues: %d\n', sum(eigvals <= tol));
+% fprintf('Mean of L^+ elements: %.6e\n', mu);
+% fprintf('Std  of L^+ elements: %.6e\n', sigma);
+% 
+% % 如果想看对角/非对角元素分布，可以另外绘制：
+% figure('Color','w','Units','normalized','Position',[0.2 0.1 0.5 0.35]);
+% histogram(triu(Lplus), 50, 'Normalization','pdf');
+% % xscale("log")
+% % yscale("log")
+% xlabel('upper triangle elements of L^+');
+% ylabel('Density');
+% title('upper triangle elements of L^+');
 
