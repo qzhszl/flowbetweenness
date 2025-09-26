@@ -1,4 +1,4 @@
-function simu_flowbetweenness_distribution(N,p)
+function simu_flowbetweenness_distribution(N,p,simutimes)
 % experiment_metrics.m
 % 假设 current_flow_betweenness.m 已经在路径中
 
@@ -8,7 +8,7 @@ function simu_flowbetweenness_distribution(N,p)
 model = 'ER';  % graph type: 'ER' or 'BA'
 n = N;       % 节点数
 p = p;      % ER 参数
-R = 1000;        % 重复次数
+R = simutimes;        % 重复次数
 
 % 保存容器
 results = struct();
