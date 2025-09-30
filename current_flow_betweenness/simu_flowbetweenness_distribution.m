@@ -72,7 +72,7 @@ for r = 1:R
     results(r).deg = degree_unweighted;
     results(r).wdeg = degree_weighted;
 end
-filename = sprintf('bet_cbet_degree_N%dp%.2fER_unweighted.mat',N,p)
+filename = sprintf('bet_cbet_degree_N%dp%.4fER_unweighted.mat',N,p)
 % 保存到文件
 save(filefolder_name+filename,'results');
 disp("mission_completed")

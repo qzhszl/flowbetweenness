@@ -1,16 +1,28 @@
 clear,clc
 filefolder_name = "D:\\data\\flow betweenness\\";
 
-N = 50;
+N = 1000;
 flow_current_node_bet_mean =[];
 flow_current_node_bet_std =[];
-p_vec = [0.05,0.09,0.1,0.2,0.3,0.4];
-% p_vec = [0.03,0.05,0.1,0.2,0.3,0.4];
-p_vec = [0.07,0.08,0.1,0.2,0.3,0.4];
+if N == 1000
+    avg = [8,10,20,50,100,200,500];
+    p_vec = avg./(N-1);
+elseif N ==200  
+    p_vec = [0.03,0.05,0.1,0.2,0.3,0.4];
+elseif N ==100
+    p_vec = [0.05,0.09,0.1,0.2,0.3,0.4];
+elseif N == 50
+    p_vec = [0.07,0.08,0.1,0.2,0.3,0.4];
+end
+
 count = 0;
 for p =p_vec
     count = count+1;
-    resname  = sprintf('bet_cbet_degree_N%dp%.2fER.mat',N,p);
+    if N>999
+        resname  = sprintf('bet_cbet_degree_N%dp%.4fER_unweighted.mat',N,p);
+    else
+        resname  = sprintf('bet_cbet_degree_N%dp%.2fER.mat',N,p);
+    end
     % resname = "bet_cbet_degree_BAnetworkN1000m3.mat"
     pos = strfind(resname,"_");
     pos  =pos(end);
@@ -44,8 +56,8 @@ h = errorbar(p_vec, flow_current_node_bet_mean, flow_current_node_bet_std, '-o',
     'CapSize', 12, ...
     'Color',"#1F77B4");                          
 
-xtest = log(p_vec(2:6));
-ytest = log(flow_current_node_bet_mean(2:6));
+xtest = log(p_vec(1:6));
+ytest = log(flow_current_node_bet_mean(1:6));
 set(gca,"YScale", "log")
 set(gca,"XScale", "log")
 % ylim([0,1200])

@@ -1,38 +1,10 @@
 clear,clc
-% clear,clc
-% % G = BAgraph(1000, 4, 3);
-% data = readmatrix('D:\\data\\flow betweenness\\BA_network\\BAnetworkN5000m3.txt');  % 每行: u v w
-% 
-% % 提取三列
-% s = data(:,1)+1;    % 起点
-% t = data(:,2)+1;    % 终点
-% w = data(:,3);    % 权重
-% 
-% % 构造无向图（如果是有向图，就用 digraph）
-% G = graph(s, t, w);
-% A = adjacency(G,"weighted")
-% 
-% [row,col,v]=find(G.Edges.Weight<=0)
-
-
-% deg = degree(G)
-% % h = histogram(deg,60,Normalization="pdf");
-% [counts, edges] = histcounts(deg, 'BinMethod','integers');
-% k = edges(1:end-1);
-% P = counts / sum(counts);
-% nz = P>0;
-% k = k(nz);
-% P = P(nz);
-% 
-% plot(k,P,"o")
-% set(gca,"YScale", "log")
-% set(gca,"XScale", "log")
-avg = 20;
+avg = 200;
 
 target_mean = 2/avg
 target_std = sqrt(2/(avg^3))
 
-n = 1000;
+n = 10000;
 p = avg/(1000-1)
 A = GenerateERfast(n,p,0);
 
@@ -76,21 +48,17 @@ for i = 1:n
 end
 
 resistances = Reff(triu(true(n),1));
-
-% 1. 拟合正态分布
-mu = mean(resistances);
-sigma = std(resistances);
+% resistances = resistances+resistances.';
 
 % 或者用 fitdist 更正规：
 pd = fitdist(resistances, 'Normal');
 mu = pd.mu;
 sigma = pd.sigma;
 
-% 2. 画直方图
+% 2. Plot histogram for resistance
 figure;
 histogram(resistances, 30, 'Normalization', 'pdf'); % 归一化成概率密度
 hold on;
-
 % 3. 画拟合的正态分布曲线
 x = linspace(min(resistances), max(resistances), 200);
 y = normpdf(x, mu, sigma);
@@ -101,35 +69,56 @@ ylabel('Probability Density');
 title(sprintf('Normal Fit: \\mu = %.3f, \\sigma = %.3f', mu, sigma));
 legend('Empirical Distribution', 'Normal Fit');
 hold off;
-% 展平所有元素并画 histogram
-% vals = Lplus(:);
-% 
-% figure('Color','w','Units','normalized','Position',[0.2 0.2 0.5 0.5]);
-% histogram(vals, 100, 'Normalization', 'pdf'); % 80 个 bin
-% xlabel('Elements of L^+');
-% ylabel('Probability density');
-% title('Histogram of all elements in Laplacian pseudoinverse (L^+)');
-% 
-% % 在图上标注均值和标准差
-% mu = mean(vals);
-% sigma = std(vals);
-% yl = ylim;
-% hold on;
-% plot([mu mu], yl, '--k', 'LineWidth',1.5);
-% text(mu, yl(2)*0.9, sprintf('\\leftarrow mean=%.3e', mu), 'FontSize',10);
-% hold off;
-% 
-% % 输出一些数值信息
-% fprintf('Number of zero (<= tol) eigenvalues: %d\n', sum(eigvals <= tol));
-% fprintf('Mean of L^+ elements: %.6e\n', mu);
-% fprintf('Std  of L^+ elements: %.6e\n', sigma);
-% 
-% % 如果想看对角/非对角元素分布，可以另外绘制：
-% figure('Color','w','Units','normalized','Position',[0.2 0.1 0.5 0.35]);
-% histogram(triu(Lplus), 50, 'Normalization','pdf');
-% % xscale("log")
-% % yscale("log")
-% xlabel('upper triangle elements of L^+');
-% ylabel('Density');
-% title('upper triangle elements of L^+');
+
+
+
+% 2. Plot histogram for ωis−ωjs+ωjt−ωit
+s = randi(n)
+t = randi(n)
+
+col_s = Reff(:, s);   % n x 1
+col_t = Reff(:, t);   % n x 1
+
+% 构造 f(i,j) 矩阵
+F = col_s - col_t;     % n x 1 向量
+G = -col_s + col_t;    % n x 1 向量
+% 组合成 n×n 矩阵：F(i) + G(j)
+X_result = F + G.';      % 每个元素就是 ωis−ωjs+ωjt−ωit
+
+X_his = X_result(triu(true(n),1));
+
+% numBins = 100;
+% [counts, edges] = histcounts(X_his, numBins);
+% validIdx = counts > 1000;
+% validEdges = edges([find(validIdx), find(validIdx)+1])
+X_his = X_his(X_his >= -0.002 & X_his <= 0.003);
+
+
+
+% 用 fitdist：
+pd = fitdist(X_his, 'Normal');
+mu = pd.mu;
+sigma = pd.sigma;
+
+figure;
+
+% h = histogram(X_his, 100, 'Normalization', 'pdf'); % 归一化成概率密度
+h = histogram(X_his, 30, 'Normalization', 'count');
+h.Values
+h.BinEdges
+hold on;
+
+% 3. 画拟合的正态分布曲线
+x = linspace(min(X_his), max(X_his), 200);
+y = normpdf(x, mu, sigma);
+plot(x, y, 'r-', 'LineWidth', 2);
+
+xlabel('X');
+ylabel('Probability Density');
+% set(gca,"YScale",'log')
+title(sprintf('Normal Fit: \\mu = %.3f, \\sigma = %.3f', mu, sigma));
+legend('Empirical Distribution', 'Normal Fit');
+hold off;
+
+
 

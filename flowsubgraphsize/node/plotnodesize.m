@@ -1,22 +1,27 @@
 clear,clc
 % plot the relation between the flow subgraph node size with the real ave degree
-N = 1000
+
 
 fig = figure; 
 fig.Position = [100 100 900 600]; 
 hold on;
 colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
-
-
-avg = 0:0.1:10;
-p_vals = avg/(N-1);
-s_vals = zeros(size(p_vals));
-for i = 1:length(p_vals)
-    s_vals(i) = compute_s_from_ER(N, p_vals(i));
+colors2 = ["#D08082","#6FB494","#D9B382"];
+count = 1;
+for N = [100,1000,10000]
+    avg = 0:0.1:10;
+    p_vals = avg/(N-1);
+    s_vals = zeros(size(p_vals));
+    for i = 1:length(p_vals)
+        s_vals(i) = compute_s_from_ER(N, p_vals(i));
+    end
+    % s_vals = s_vals.^1.5
+    plot(avg, s_vals, 'LineWidth', 4, Color=colors2(count))
+    count = count+1
+    hold on
 end
-% s_vals = s_vals.^1.5
-plot(avg, s_vals, 'LineWidth', 4, Color=colors(6))
-hold on
+
+
 
 % N = 10000
 % avefsg_size_filename = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\nodesize10000node\\%dnode\\ave_fsg_withdiff_avg.txt",N);
@@ -111,19 +116,29 @@ y_new = [y1_new y2];
 plot(x_new,y_new/100, 'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(2))
 
 % data for 1000
+N = 1000
 filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new";
 outname = fullfile(filefolder_name, sprintf('%dnode_results_summary.csv', N));
 result_table = readtable(outname);
 plot(result_table.RealAveDegree,result_table.SizeFSG/N,'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(3))
 hold on
 
+
+% data for 10000
+N  = 10000;
+filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new";
+outname = fullfile(filefolder_name, sprintf('%dnode_results_summary.csv', N));
+result_table = readtable(outname);
+plot(result_table.RealAveDegree,result_table.SizeFSG/N,'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(4))
 hold on
-lgd= legend("Analytical","$N =10^2$","$N =10^3$","$N =10^4$", 'interpreter','latex','Location', 'southeast',FontSize=24);
+
+
+lgd= legend("Analytical,$N =10^2$","Analytical,$N =10^3$","Analytical,$N =10^4$","Simulation,$N =10^2$","Simulation,$N =10^3$","Simulation,$N =10^4$", 'interpreter','latex','Location', 'southeast',FontSize=24);
 % lgd=legend("ana","100","1000","100","100_2")
 
 xlabel('$E[D]$',Interpreter='latex',FontSize=24);
 ylabel('$\frac{N_f}{N}$','interpreter','latex',FontSize=30)
-ylim = ([0,0.12]);
+ylim = ([0,1.2]);
 % set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
 box on
 
@@ -131,6 +146,10 @@ ax = gca;  % Get current axis
 ax.FontSize = 20;  % Set font size for tick label
 picname = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\new\\size_flow_subgraph.pdf");
 exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
+
+
+
+
 
 % for large network
 %__________________________________________________________________________
