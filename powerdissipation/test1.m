@@ -1,4 +1,4 @@
-function [total_power_givenst, EdgeEnergy_flow] = test1(G, s, t) 
+function [total_power_givenst, EdgeEnergy_flow] = compute_power_dissipation_eachlink_new(G, s, t) 
 % 输入:
 %   G: graph 对象, G.Edges.Weight = 导纳 g
 %   s, t: 节点编号 (注入/抽出电流)
@@ -8,7 +8,7 @@ m = numedges(G);
 g = G.Edges.Weight;   % 边导纳
 
 % 构造稀疏拉普拉斯矩阵
-Adj = adjacency(G, g, 'weighted');
+Adj = adjacency(G, 'weighted');
 L = spdiags(sum(Adj,2), 0, n, n) - Adj;
 
 % 构造 b 向量

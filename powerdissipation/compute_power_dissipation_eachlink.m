@@ -1,4 +1,4 @@
-function compute_power_dissipation_eachlink(n, p, simu_times)
+function compute_power_dissipation_eachlink_original(n, p, simu_times)
 %SIMULATE_ER_POWER 重复生成 ER 图，计算所有节点对的能量消耗
 %
 % 输入:
@@ -62,7 +62,8 @@ for k = 1:simu_times
                 t2 = toc;
                 fprintf('部分2运行时间: %.4f 秒\n', t2);
                 tic
-                [total_Flow_fornodepair, link_Flow_fornodepair] = compute_flownetwork_power_dissipation(G,s,t);
+                [total_Flow_fornodepair2, link_Flow_fornodepair2] = test1(G,s,t);
+                find(abs(total_Flow_fornodepair2 - total_Flow_fornodepair)>0.000001)
                 t3 = toc;
                 fprintf('部分3运行时间: %.4f 秒\n', t3);
             end

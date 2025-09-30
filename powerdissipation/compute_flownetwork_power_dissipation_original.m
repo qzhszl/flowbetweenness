@@ -20,6 +20,7 @@ L = diag(sum(Adj,2)) - Adj;
 
 % 伪逆解电势
 Lplus = pinv(full(L));
+
 b = zeros(n,1); b(s)=1; b(t)=-1;
 v = Lplus*b;
 
