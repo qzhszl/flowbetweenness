@@ -1,10 +1,10 @@
 clear,clc
-avg = 200;
+avg = 20;
 
 target_mean = 2/avg
 target_std = sqrt(2/(avg^3))
 
-n = 1000;
+n = 200;
 p = avg/(1000-1)
 A = GenerateERfast(n,p,0);
 
@@ -66,7 +66,7 @@ plot(x, y, 'r-', 'LineWidth', 2);
 
 xlabel('Effective Resistance');
 ylabel('Probability Density');
-title(sprintf('Normal Fit: \\mu = %.3f, \\sigma = %.3f', mu, sigma));
+title(sprintf('Normal Fit: \\mu = %.3f, \\sigma = %.6f', mu, sigma));
 legend('Empirical Distribution', 'Normal Fit');
 hold off;
 
@@ -84,14 +84,17 @@ F = col_s - col_t;     % n x 1 向量
 G = -col_s + col_t;    % n x 1 向量
 % 组合成 n×n 矩阵：F(i) + G(j)
 X_result = F + G.';      % 每个元素就是 ωis−ωjs+ωjt−ωit
+X_result = X_result.^2;
+
+
 
 X_his = X_result(triu(true(n),1));
 
 % numBins = 100;
 % [counts, edges] = histcounts(X_his, numBins);
-% validIdx = counts > 1000;
+% validIdx = counts > 100;
 % validEdges = edges([find(validIdx), find(validIdx)+1])
-% X_his = X_his(X_his >= -0.002 & X_his <= 0.003);
+% X_his = X_his(X_his >= 0 & X_his <= 0.00015);
 
 
 
@@ -103,9 +106,9 @@ sigma = pd.sigma;
 figure;
 
 % h = histogram(X_his, 100, 'Normalization', 'pdf'); % 归一化成概率密度
-h = histogram(X_his, 10000, 'Normalization', 'count');
-h.Values
-h.BinEdges
+h = histogram(X_his, 100, 'Normalization', 'count');
+% h.Values
+% h.BinEdges
 hold on;
 
 % 3. 画拟合的正态分布曲线
@@ -115,8 +118,8 @@ plot(x, y, 'r-', 'LineWidth', 2);
 
 xlabel('X');
 ylabel('Probability Density');
-set(gca,"YScale",'log')
-title(sprintf('Normal Fit: \\mu = %.3f, \\sigma = %.3f', mu, sigma));
+% set(gca,"YScale",'log')
+title(sprintf('Normal Fit: \\mu = %.4f, \\sigma = %.6f', mu, sigma));
 legend('Empirical Distribution', 'Normal Fit');
 hold off;
 
