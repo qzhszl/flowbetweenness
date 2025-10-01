@@ -1,17 +1,21 @@
 clear,clc
 filefolder_name = "D:\\data\\flow betweenness\\";
 
-n = 20;
-p_vec = [0.08,0.1,0.15,0.2,0.28,0.39,0.5,0.66];
-p_vec=[0.15,0.28,0.39,0.66,0.88]
+n = 200;
+% p_vec = [0.08,0.1,0.15,0.2,0.28,0.39,0.5,0.66];
+% p_vec=[0.15,0.28,0.39,0.66,0.88]
 % p_vec = [0.05,0.1,0.2,0.5]
+if n == 200
+    p_vec = [0.03,0.04,0.06,0.11,0.15,0.28,0.39,0.66,0.88];
+end
+
 ave_link_power_vec = zeros(length(p_vec),1);
 std_link_power_vec = zeros(length(p_vec),1);
 
 count = 0;
 for p = p_vec
     count = count+1;
-    resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
+    resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
     filename = filefolder_name+resname;
     
     % load_and_plot_powerdissipation.m

@@ -1,9 +1,11 @@
 clear,clc
 filefolder_name = "D:\\data\\flow betweenness\\";
 
-n = 20;
-p = 0.66;
-resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
+p_vec = [0.03,0.04,0.06,0.11,0.15,0.28,0.39,0.66,0.88];
+
+n = 200;
+p = 0.03;
+resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
 filename = filefolder_name+resname;
 
 % load_and_plot_powerdissipation.m
@@ -57,11 +59,19 @@ colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 % histogram(link_energy_path, 60, 'Normalization', 'pdf', FaceColor='#D08082'); % 50 bins
 % hold on
 
+% h = histogram(link_energy_flow, 60, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
+% hold on
+
+numBins = 100;
+[counts, edges] = histcounts(link_energy_flow, numBins);
+validIdx = counts > 3;
+validEdges = edges([find(validIdx), find(validIdx)+1]);
+link_energy_flow = link_energy_flow(link_energy_flow >= 0 & link_energy_flow <= max(validEdges));
 h = histogram(link_energy_flow, 60, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
 hold on
 
 % set(gca,"XScale", "log")
-% set(gca,"YScale", "log")
+set(gca,"YScale", "log")
 
 ylabel('$f_{E_l}(x)$','interpreter','latex','FontSize',30)
 xlabel('$x$','interpreter','latex','FontSize',30);

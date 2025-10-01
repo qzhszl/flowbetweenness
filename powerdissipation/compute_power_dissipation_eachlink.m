@@ -1,4 +1,4 @@
-function compute_power_dissipation_eachlink_original(n, p, simu_times)
+function compute_power_dissipation_eachlink(n, p, simu_times)
 %SIMULATE_ER_POWER 重复生成 ER 图，计算所有节点对的能量消耗
 %
 % 输入:
@@ -22,7 +22,7 @@ filefolder_name = "D:\\data\\flow betweenness\\";
 for k = 1:simu_times
     fprintf('rep %d/%d\n', k, simu_times);
     % ---- 生成 ER 图 ----
-    A =  GenerateERfast(n,p,0);
+    A =  GenerateERfast(n,p,1);
     G = graph(A);  % 无向图
 %     figure;
 %     plot(G,'EdgeLabel',G.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
@@ -47,25 +47,23 @@ for k = 1:simu_times
         for t = (s+1):n
             count = count+1;
             % shortest path
-            tic
+            
             [total_SP_fornodepair, link_SP_fornodepair,connected_flag] = compute_path_power_dissipation(G_path,s,t);
-            t1 = toc;
-            fprintf('1 time: %.4f s\n', t1);
+            
             if connected_flag==1
-                tic
+    
                 total_SP(count) = total_SP_fornodepair; 
                 linkP_SP = linkP_SP+link_SP_fornodepair;
                 % current flow
                 [total_Flow_fornodepair, link_Flow_fornodepair] = compute_flownetwork_power_dissipation(G,s,t);
                 total_Flow(count) = total_Flow_fornodepair;
                 linkP_Flow = linkP_Flow+link_Flow_fornodepair;
-                t2 = toc;
-                fprintf('部分2运行时间: %.4f 秒\n', t2);
-                tic
-                [total_Flow_fornodepair2, link_Flow_fornodepair2] = test1(G,s,t);
-                find(abs(total_Flow_fornodepair2 - total_Flow_fornodepair)>0.000001)
-                t3 = toc;
-                fprintf('部分3运行时间: %.4f 秒\n', t3);
+
+                [total_Flow_fornodepair2, link_Flow_fornodepair2] = compute_flownetwork_power_dissipation_original(G,s,t);
+                
+
+                find(abs(link_Flow_fornodepair-link_Flow_fornodepair2)>0.000001)
+                
             end
         end
     end
@@ -80,7 +78,7 @@ end
 
 filename = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
 % 保存到文件
-% save(filefolder_name+filename,'results');
+save(filefolder_name+filename,'results');
 disp("mission_completed")
 end
 

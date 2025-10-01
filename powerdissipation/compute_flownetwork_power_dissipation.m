@@ -1,4 +1,5 @@
-function [total_power_givenst, EdgeEnergy_flow] = compute_power_dissipation_eachlink_new(G, s, t) 
+function [total_power_givenst, EdgeEnergy_flow] = compute_flownetwork_power_dissipation(G, s, t) 
+% compute_flownetwork_power_ on each link
 % 输入:
 %   G: graph 对象, G.Edges.Weight = 导纳 g
 %   s, t: 节点编号 (注入/抽出电流)

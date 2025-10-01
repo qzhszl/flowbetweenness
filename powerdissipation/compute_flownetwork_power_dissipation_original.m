@@ -1,4 +1,4 @@
-function [total_power_givenst,EdgeEnergy_flow] = compute_flownetwork_power_dissipation(G, s, t)
+function [total_power_givenst,EdgeEnergy_flow] = compute_flownetwork_power_dissipation_original(G, s, t)
 %EDGEENERGYCURRENTFLOW 计算电流定律模型下的能量消耗 (权重=导纳)
 %
 % 输入:
