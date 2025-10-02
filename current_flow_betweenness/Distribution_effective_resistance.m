@@ -1,17 +1,20 @@
 clear,clc
 % clear,clc
-% % G = BAgraph(1000, 4, 3);
-% data = readmatrix('D:\\data\\flow betweenness\\BA_network\\BAnetworkN5000m3.txt');  % 每行: u v w
-% 
-% % 提取三列
-% s = data(:,1)+1;    % 起点
-% t = data(:,2)+1;    % 终点
-% w = data(:,3);    % 权重
-% 
-% % 构造无向图（如果是有向图，就用 digraph）
-% G = graph(s, t, w);
-% A = adjacency(G,"weighted")
-% 
+
+% load BA netwok
+G = BAgraph(1000, 4, 3);
+data = readmatrix('D:\\data\\flow betweenness\\BAnetworks\\BAnetworkN5000m3.txt');  % 每行: u v w
+
+% 提取三列
+s = data(:,1)+1;    % 起点
+t = data(:,2)+1;    % 终点
+w = data(:,3);    % 权重
+
+% 构造无向图（如果是有向图，就用 digraph）
+G = graph(s, t, w);
+A = adjacency(G,"weighted");
+n = size(A,1);
+
 % [row,col,v]=find(G.Edges.Weight<=0)
 
 
@@ -27,14 +30,16 @@ clear,clc
 % plot(k,P,"o")
 % set(gca,"YScale", "log")
 % set(gca,"XScale", "log")
-avg = 50;
 
-target_mean = 2/avg
-target_std = sqrt(2/(avg^3))
-
-n = 1000;
-p = avg/(1000-1)
-A = GenerateERfast(n,p,0);
+% % Generate an ER network
+% avg = 6;
+% 
+% target_mean = 2/avg
+% target_std = sqrt(2/(avg^3))
+% 
+% n = 1000;
+% p = avg/(1000-1)
+% A = GenerateERfast(n,p,0);
 
 % 度矩阵与拉普拉斯
 deg = sum(A,2);
@@ -76,6 +81,8 @@ for i = 1:n
 end
 
 resistances = Reff(triu(true(n),1));
+writematrix(resistances,'D:\\data\\flow betweenness\\BAnetworks\\BAnetworkN5000m3_effective_resistance.txt')
+
 
 % 1. 拟合正态分布
 mu = mean(resistances);
@@ -87,49 +94,59 @@ mu = pd.mu;
 sigma = pd.sigma;
 
 % 2. 画直方图
-figure;
-histogram(resistances, 30, 'Normalization', 'pdf'); % 归一化成概率密度
+fig = figure; 
+fig.Position = [100 100 600 600];
+colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
+% for count  =1:6
+%     plot(linspace(1,10,10),count*ones(10,1),Color=colors(count))
+%     hold on
+% end
+
+
+histogram(resistances, 50, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 归一化成概率密度
 hold on;
 
 % 3. 画拟合的正态分布曲线
 x = linspace(min(resistances), max(resistances), 200);
 y = normpdf(x, mu, sigma);
-plot(x, y, 'r-', 'LineWidth', 2);
+plot(x, y, "Color",'#D08082', 'LineWidth', 5);
 
-xlabel('Effective Resistance');
-ylabel('Probability Density');
-title(sprintf('Normal Fit: \\mu = %.3f, \\sigma = %.3f', mu, sigma));
-legend('Empirical Distribution', 'Normal Fit');
+ax = gca;  % Get current axis
+ax.FontSize = 30;  % Set font size for tick label
+box on
+
+
+xlim_ = xlim; ylim_ = ylim;
+dx = 0.02*(xlim_(2)-xlim_(1));   % 横向内缩 2%
+dy = 0.03*(ylim_(2)-ylim_(1));   % 纵向下移 5%
+str = {'$N = 10^{3}$', '$E[D] = 6$'};  % cell 数组自动分两行
+text(xlim_(2)-dx, ylim_(2)-dy, str, ...
+     'Interpreter','latex', ...
+     'VerticalAlignment','top', ...
+     'HorizontalAlignment','right', ...
+     'FontSize',30);
+
+dx = 0.02*(xlim_(2)-xlim_(1));
+dy = 0.08*(ylim_(2)-ylim_(1));
+% LaTeX 格式的字符串
+str = sprintf('Gaussian:\n$\\mu = %.4f$\n $\\sigma = %.4f$', mu, sigma);
+% 在右下角加文字
+text(xlim_(2)-dx, ylim_(1)+dy, str, ...
+     'Interpreter','latex', ...
+     'HorizontalAlignment','right', ...
+     'VerticalAlignment','bottom', ...
+     'FontSize',29);
+
+% ylim([0,105])
+xlabel('$x$', interpreter = "latex",FontSize=40);
+ylabel('$f_{\Lambda_G}(x)$',interpreter = "latex",FontSize=40);
+% title(sprintf('Normal Fit: \\mu = %.3f, \\sigma = %.3f', mu, sigma));
+fit_legend_name = sprintf('Gaussian Fit:\n \\mu = %.4f, \\sigma = %.4f', mu, sigma);
+% legend('Empirical Distribution', fit_legend_name,FontSize=28);
 hold off;
-% 展平所有元素并画 histogram
-% vals = Lplus(:);
-% 
-% figure('Color','w','Units','normalized','Position',[0.2 0.2 0.5 0.5]);
-% histogram(vals, 100, 'Normalization', 'pdf'); % 80 个 bin
-% xlabel('Elements of L^+');
-% ylabel('Probability density');
-% title('Histogram of all elements in Laplacian pseudoinverse (L^+)');
-% 
-% % 在图上标注均值和标准差
-% mu = mean(vals);
-% sigma = std(vals);
-% yl = ylim;
-% hold on;
-% plot([mu mu], yl, '--k', 'LineWidth',1.5);
-% text(mu, yl(2)*0.9, sprintf('\\leftarrow mean=%.3e', mu), 'FontSize',10);
-% hold off;
-% 
-% % 输出一些数值信息
-% fprintf('Number of zero (<= tol) eigenvalues: %d\n', sum(eigvals <= tol));
-% fprintf('Mean of L^+ elements: %.6e\n', mu);
-% fprintf('Std  of L^+ elements: %.6e\n', sigma);
-% 
-% % 如果想看对角/非对角元素分布，可以另外绘制：
-% figure('Color','w','Units','normalized','Position',[0.2 0.1 0.5 0.35]);
-% histogram(triu(Lplus), 50, 'Normalization','pdf');
-% % xscale("log")
-% % yscale("log")
-% xlabel('upper triangle elements of L^+');
-% ylabel('Density');
-% title('upper triangle elements of L^+');
+% picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\graphdissipation_distribution_N%d_p%.2f.pdf",n,p);
+picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\graphdissipation_distribution_N%BA.pdf",n);
+
+% exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
+print(fig, picname, '-dpdf', '-r600', '-bestfit');
 
