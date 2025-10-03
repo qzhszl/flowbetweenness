@@ -22,9 +22,9 @@ clear,clc
 
 for N = 1000
     % for p=[0.15,0.28,0.39,0.66,0.88]
-    avg = 50
-    for p=[0.0501]
-        compute_power_dissipation_eachlink(N,p,100)
+    avg = [8,50];
+    for p=avg/(N-1)
+        compute_power_dissipation_eachlink(N,p,1,0)
     end
 end
 

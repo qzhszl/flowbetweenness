@@ -3,9 +3,9 @@ filefolder_name = "D:\\data\\flow betweenness\\";
 
 p_vec = [0.03,0.04,0.06,0.11,0.15,0.28,0.39,0.66,0.88];
 
-n = 200;
-p = 0.03;
-resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
+n = 50;
+p = 0.08;
+resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
 filename = filefolder_name+resname;
 
 % load_and_plot_powerdissipation.m
@@ -13,10 +13,10 @@ S = load(filename);
 results = S.results;
 
 % % 2. 拼接所有实验的 energy
-total_energy_path = [];
-for r = 1:numel(results)
-    total_energy_path = [total_energy_path; results(r).total_SP(:)];
-end
+% total_energy_path = [];
+% for r = 1:numel(results)
+%     total_energy_path = [total_energy_path; results(r).total_SP(:)];
+% end
 
 
 total_energy_flow = [];
@@ -62,18 +62,23 @@ colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 % h = histogram(link_energy_flow, 60, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
 % hold on
 
-numBins = 100;
+numBins = 50;
 [counts, edges] = histcounts(link_energy_flow, numBins);
 validIdx = counts > 3;
 validEdges = edges([find(validIdx), find(validIdx)+1]);
 link_energy_flow = link_energy_flow(link_energy_flow >= 0 & link_energy_flow <= max(validEdges));
-h = histogram(link_energy_flow, 60, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
+h = histogram(link_energy_flow, 30, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
+hold on
+[counts, edges] = histcounts(link_energy_flow, 30, 'Normalization', 'pdf');
+centers = (edges(1:end-1) + edges(2:end)) / 2;
+plot(centers,counts)
+
 hold on
 
 % set(gca,"XScale", "log")
-set(gca,"YScale", "log")
+% set(gca,"YScale", "log")
 
-ylabel('$f_{E_l}(x)$','interpreter','latex','FontSize',30)
+ylabel('$f_{\Gamma_l}(x)$','interpreter','latex','FontSize',30)
 xlabel('$x$','interpreter','latex','FontSize',30);
 
 

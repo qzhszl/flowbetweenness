@@ -2,18 +2,22 @@ clear,clc
 % clear,clc
 
 % load BA netwok
-G = BAgraph(1000, 4, 3);
-data = readmatrix('D:\\data\\flow betweenness\\BAnetworks\\BAnetworkN5000m3.txt');  % 每行: u v w
-
-% 提取三列
-s = data(:,1)+1;    % 起点
-t = data(:,2)+1;    % 终点
-w = data(:,3);    % 权重
-
-% 构造无向图（如果是有向图，就用 digraph）
-G = graph(s, t, w);
-A = adjacency(G,"weighted");
-n = size(A,1);
+% G = BAgraph(1000, 4, 3);
+% n = 1000;
+% m=3; 
+% BA_network_name = sprintf('D:\\data\\flow betweenness\\BAnetworks\\BAnetworkN%dm%d.txt',n,m);
+% data = readmatrix(BA_network_name);  % 每行: u v w
+% BA_flag = 1;
+% 
+% % 提取三列
+% s = data(:,1)+1;    % 起点
+% t = data(:,2)+1;    % 终点
+% w = data(:,3);    % 权重
+% 
+% % 构造无向图（如果是有向图，就用 digraph）
+% G = graph(s, t, w);
+% A = adjacency(G);
+% n = size(A,1);
 
 % [row,col,v]=find(G.Edges.Weight<=0)
 
@@ -32,14 +36,16 @@ n = size(A,1);
 % set(gca,"XScale", "log")
 
 % % Generate an ER network
-% avg = 6;
-% 
-% target_mean = 2/avg
-% target_std = sqrt(2/(avg^3))
-% 
-% n = 1000;
-% p = avg/(1000-1)
-% A = GenerateERfast(n,p,0);
+avg = 200;
+
+target_mean = 2/avg
+target_std = sqrt(2/(avg^3))
+
+n = 1000;
+p = avg/(n-1)
+weighted = 1;
+A = GenerateERfast(n,p,weighted);
+BA_flag = 0;
 
 % 度矩阵与拉普拉斯
 deg = sum(A,2);
@@ -81,7 +87,11 @@ for i = 1:n
 end
 
 resistances = Reff(triu(true(n),1));
-writematrix(resistances,'D:\\data\\flow betweenness\\BAnetworks\\BAnetworkN5000m3_effective_resistance.txt')
+
+if BA_flag ==1
+    resistancename = sprintf('D:\\data\\flow betweenness\\BAnetworks\\BAnetworkN%dm%d_effective_resistance_unweighted.txt',n,m);
+    writematrix(resistances,resistancename)
+end
 
 
 % 1. 拟合正态分布
@@ -115,37 +125,61 @@ ax = gca;  % Get current axis
 ax.FontSize = 30;  % Set font size for tick label
 box on
 
+if BA_flag==0
+    xlim_ = xlim; ylim_ = ylim;
+    dx = 0.02*(xlim_(2)-xlim_(1));   % 横向内缩 2%
+    dy = 0.03*(ylim_(2)-ylim_(1));   % 纵向下移 5%
+    edstr = sprintf('$E[D] = %d$',avg);
+    str = {'$N = 10^{3}$', edstr};  % cell 数组自动分两行
+    text(xlim_(2)-dx, ylim_(2)-dy, str, ...
+         'Interpreter','latex', ...
+         'VerticalAlignment','top', ...
+         'HorizontalAlignment','right', ...
+         'FontSize',30);
+else
+    xlim_ = xlim; ylim_ = ylim;
+    dx = 0.05*(xlim_(2)-xlim_(1));   % 横向内缩 2%
+    dy = 0.03*(ylim_(2)-ylim_(1));   % 纵向下移 5%
+    str = {'$N = 10^{3}$', '$\gamma = 2.7$'};  % cell 数组自动分两行
+    text(xlim_(1)+dx, ylim_(2)-dy, str, ...
+         'Interpreter','latex', ...
+         'VerticalAlignment','top', ...
+         'HorizontalAlignment','left', ...
+         'FontSize',30);
+end
 
-xlim_ = xlim; ylim_ = ylim;
-dx = 0.02*(xlim_(2)-xlim_(1));   % 横向内缩 2%
-dy = 0.03*(ylim_(2)-ylim_(1));   % 纵向下移 5%
-str = {'$N = 10^{3}$', '$E[D] = 6$'};  % cell 数组自动分两行
-text(xlim_(2)-dx, ylim_(2)-dy, str, ...
-     'Interpreter','latex', ...
-     'VerticalAlignment','top', ...
-     'HorizontalAlignment','right', ...
-     'FontSize',30);
-
-dx = 0.02*(xlim_(2)-xlim_(1));
-dy = 0.08*(ylim_(2)-ylim_(1));
-% LaTeX 格式的字符串
-str = sprintf('Gaussian:\n$\\mu = %.4f$\n $\\sigma = %.4f$', mu, sigma);
-% 在右下角加文字
-text(xlim_(2)-dx, ylim_(1)+dy, str, ...
-     'Interpreter','latex', ...
-     'HorizontalAlignment','right', ...
-     'VerticalAlignment','bottom', ...
-     'FontSize',29);
+if avg>40
+    dx = 0.02*(xlim_(2)-xlim_(1));
+    dy = 0.08*(ylim_(2)-ylim_(1));
+    % LaTeX 格式的字符串
+    str = sprintf('Gaussian:\n$\\mu = %.4f$\n $\\sigma = %.4f$', mu, sigma);
+    % 在右下角加文字
+    text(xlim_(2)-dx, ylim_(1)+dy, str, ...
+         'Interpreter','latex', ...
+         'HorizontalAlignment','right', ...
+         'VerticalAlignment','bottom', ...
+         'FontSize',29);
+end
 
 % ylim([0,105])
 xlabel('$x$', interpreter = "latex",FontSize=40);
 ylabel('$f_{\Lambda_G}(x)$',interpreter = "latex",FontSize=40);
+
+
 % title(sprintf('Normal Fit: \\mu = %.3f, \\sigma = %.3f', mu, sigma));
 fit_legend_name = sprintf('Gaussian Fit:\n \\mu = %.4f, \\sigma = %.4f', mu, sigma);
 % legend('Empirical Distribution', fit_legend_name,FontSize=28);
 hold off;
-% picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\graphdissipation_distribution_N%d_p%.2f.pdf",n,p);
-picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\graphdissipation_distribution_N%BA.pdf",n);
+
+if BA_flag==1
+    picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\graphdissipation_distribution_N%d_m%dBA.pdf",n,m);
+else
+    if weighted ==0
+        picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\graphdissipation_distribution_N%d_p%.2f.pdf",n,p);
+    else
+        picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\graphdissipation_distribution_N%d_p%.2f_weighted.pdf",n,p);
+    end
+end
 
 % exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
 print(fig, picname, '-dpdf', '-r600', '-bestfit');

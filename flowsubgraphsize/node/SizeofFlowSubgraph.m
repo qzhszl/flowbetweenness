@@ -2,15 +2,15 @@ clear,clc
 % this.m inverstigate the size of the flow subgraph(nodes) in ER graph
 % We need 
 
-N = 80;
+N = 100;
 pc= log(N)/N;
-ave_degree = 1:0.2:4.9;
+ave_degree = 0.2:0.2:4.9;
 ave_degree_2 = 5:10;
 
 % ave_degree = 1.2:0.2:4;
 % ave_degree_2 = 5:10;
-% ave_degree = [ave_degree,ave_degree_2];
-p_list = ave_degree_2/(N-1);
+ave_degree = [ave_degree,ave_degree_2];
+p_list = ave_degree/(N-1);
    
 
 % nodep_list =zeros(length(p_list),1);

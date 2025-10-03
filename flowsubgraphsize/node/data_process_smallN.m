@@ -1,7 +1,7 @@
 clear,clc
 
-N = 1000;
-ave_degree = 1:0.2:4.9;
+N = 100;
+ave_degree = 0.2:0.2:4.9;
 ave_degree_2 = 5:10;
 ave_degree = [ave_degree,ave_degree_2];
 p_list = ave_degree/(N-1);

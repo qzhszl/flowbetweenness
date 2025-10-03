@@ -6,9 +6,9 @@ fig = figure;
 fig.Position = [100 100 900 600]; 
 hold on;
 colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
-colors2 = ["#D08082","#6FB494","#D9B382"];
+% colors2 = ["#D08082","#6FB494","#D9B382","#C89FBF",];
 count = 1;
-for N = [100,1000,10000]
+for N = [10,20,50,100,1000,10000]
     avg = 0:0.1:10;
     p_vals = avg/(N-1);
     s_vals = zeros(size(p_vals));
@@ -16,11 +16,37 @@ for N = [100,1000,10000]
         s_vals(i) = compute_s_from_ER(N, p_vals(i));
     end
     % s_vals = s_vals.^1.5
-    plot(avg, s_vals, 'LineWidth', 4, Color=colors2(count))
-    count = count+1
+    plot(avg, s_vals, 'LineWidth', 4, Color=colors(count))
+    count = count+1;
     hold on
 end
 
+
+% data for 10
+N = 10;
+filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new";
+outname = fullfile(filefolder_name, sprintf('%dnode_results_summary.csv', N));
+result_table = readtable(outname);
+plot(result_table.RealAveDegree,result_table.SizeFSG/N,'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(1))
+hold on
+
+
+% data for 20
+N = 20;
+filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new";
+outname = fullfile(filefolder_name, sprintf('%dnode_results_summary.csv', N));
+result_table = readtable(outname);
+plot(result_table.RealAveDegree,result_table.SizeFSG/N,'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(2))
+hold on
+
+
+% data for 50
+N = 50;
+filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new";
+outname = fullfile(filefolder_name, sprintf('%dnode_results_summary.csv', N));
+result_table = readtable(outname);
+plot(result_table.RealAveDegree,result_table.SizeFSG/N,'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(3))
+hold on
 
 
 % N = 10000
@@ -113,14 +139,14 @@ y2 = y(x>5);
 x_new = [x1_new x2];
 y_new = [y1_new y2];
 
-plot(x_new,y_new/100, 'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(2))
+plot(x_new,y_new/100, 'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(4))
 
 % data for 1000
 N = 1000
 filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new";
 outname = fullfile(filefolder_name, sprintf('%dnode_results_summary.csv', N));
 result_table = readtable(outname);
-plot(result_table.RealAveDegree,result_table.SizeFSG/N,'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(3))
+plot(result_table.RealAveDegree,result_table.SizeFSG/N,'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(5))
 hold on
 
 
@@ -129,11 +155,14 @@ N  = 10000;
 filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new";
 outname = fullfile(filefolder_name, sprintf('%dnode_results_summary.csv', N));
 result_table = readtable(outname);
-plot(result_table.RealAveDegree,result_table.SizeFSG/N,'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(4))
+plot(result_table.RealAveDegree,result_table.SizeFSG/N,'o--','LineWidth', 2, 'MarkerSize', 10,Color=colors(6))
 hold on
 
 
-lgd= legend("Analytical,$N =10^2$","Analytical,$N =10^3$","Analytical,$N =10^4$","Simulation,$N =10^2$","Simulation,$N =10^3$","Simulation,$N =10^4$", 'interpreter','latex','Location', 'southeast',FontSize=24);
+% lgd= legend("Analytical,$N =10^2$","Analytical,$N =10^3$","Analytical,$N =10^4$","Simulation,$N =10^2$","Simulation,$N =10^3$","Simulation,$N =10^4$", 'interpreter','latex','Location', 'southeast',FontSize=24);
+
+lgd= legend("Analytical,$N =10$","Analytical,$N =20$","Analytical,$N =50$","Analytical,$N =10^2$","Analytical,$N =10^3$","Analytical,$N =10^4$","Simulation,$N =10^2$","Simulation,$N =10^3$","Simulation,$N =10^4$", 'interpreter','latex','Location', 'southeast',FontSize=24);
+
 % lgd=legend("ana","100","1000","100","100_2")
 
 xlabel('$E[D]$',Interpreter='latex',FontSize=24);
