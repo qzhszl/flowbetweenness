@@ -4,7 +4,7 @@ filefolder_name = "D:\\data\\flow betweenness\\";
 p_vec = [0.03,0.04,0.06,0.11,0.15,0.28,0.39,0.66,0.88];
 
 n = 50;
-p = 0.08;
+p = 0.1;
 resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
 filename = filefolder_name+resname;
 
@@ -63,22 +63,22 @@ colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 % hold on
 
 numBins = 50;
-[counts, edges] = histcounts(link_energy_flow, numBins);
-validIdx = counts > 3;
-validEdges = edges([find(validIdx), find(validIdx)+1]);
-link_energy_flow = link_energy_flow(link_energy_flow >= 0 & link_energy_flow <= max(validEdges));
+% [counts, edges] = histcounts(link_energy_flow, numBins);
+% validIdx = counts > 3;
+% validEdges = edges([find(validIdx), find(validIdx)+1]);
+% link_energy_flow = link_energy_flow(link_energy_flow >= 0 & link_energy_flow <= max(validEdges));
 h = histogram(link_energy_flow, 30, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
 hold on
 [counts, edges] = histcounts(link_energy_flow, 30, 'Normalization', 'pdf');
 centers = (edges(1:end-1) + edges(2:end)) / 2;
-plot(centers,counts)
+% plot(centers,counts)
 
-hold on
+% hold on
 
 % set(gca,"XScale", "log")
 % set(gca,"YScale", "log")
 
-ylabel('$f_{\Gamma_l}(x)$','interpreter','latex','FontSize',30)
+ylabel('$f_{\Lambda_l}(x)$','interpreter','latex','FontSize',30)
 xlabel('$x$','interpreter','latex','FontSize',30);
 
 

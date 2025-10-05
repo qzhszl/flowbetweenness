@@ -36,14 +36,14 @@ clear,clc
 % set(gca,"XScale", "log")
 
 % % Generate an ER network
-avg = 200;
+avg = 10;
 
 target_mean = 2/avg
 target_std = sqrt(2/(avg^3))
 
-n = 1000;
+n = 50;
 p = avg/(n-1)
-weighted = 1;
+weighted = 0;
 A = GenerateERfast(n,p,weighted);
 BA_flag = 0;
 
@@ -182,5 +182,5 @@ else
 end
 
 % exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
-print(fig, picname, '-dpdf', '-r600', '-bestfit');
+% print(fig, picname, '-dpdf', '-r600', '-bestfit');
 

@@ -13,7 +13,7 @@ clear, clc
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
 N_vec = [10, 20, 50, 100, 200];
-N_vec = [10];
+N_vec = [100];
 p_start_vec = zeros(4,1);
 count = 1; 
 for N = N_vec
@@ -21,7 +21,7 @@ for N = N_vec
     count = count+1;
 end
 
-simutimes = 1000;
+simutimes = 1;
 count =1;
 for N = N_vec
     N
@@ -31,7 +31,7 @@ for N = N_vec
     for p= p_vec
         p
         for simu_time = 1:simutimes
-            simu_time
+%             simu_time
             % 1. generate a graph
             % _________________________________________________________________________
             % (b) ER:
@@ -46,10 +46,11 @@ for N = N_vec
 
             % 2. run simulations
             [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_ER(A_input);
+            
             result(simu_time,:) = [L_add_output,L_ouput,L_comm_output,Norm_output];
         end
         filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_weight01.txt",N,p);
-        writematrix(result,filename)
+%         writematrix(result,filename)
     end
     count = count+1;
 end
@@ -63,7 +64,16 @@ function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_
     % input network
     D = Input_Omega;
     N = size(D,1);
+    tic
     [output_Atilde,output_Omega] = IERP(D);
+    t3 = toc
+    tic
+    [output_Atilde2,output_Omega2] = IERP_speedtest(D);
+    t4 = toc
+    data3diff = find(abs(output_Atilde2-output_Atilde)>0.00001)
+    data4diff = find(abs(output_Omega2-output_Omega)>0.00001)
+    
+
     % Store the results
     % 1. The number of links added in the graph
     L_add_output = 0.5*(nnz(output_Atilde)-nnz(A_input));
