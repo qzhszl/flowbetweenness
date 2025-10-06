@@ -83,7 +83,7 @@ hold on
 % set(gca,"XScale", "log")
 % set(gca,"YScale", "log")
 
-ylabel('$f_{\Gamma_l}(x)$','interpreter','latex','FontSize',30)
+ylabel('$f_{\Lambda_l}(x)$','interpreter','latex','FontSize',30)
 xlabel('$x$','interpreter','latex','FontSize',30);
 
 

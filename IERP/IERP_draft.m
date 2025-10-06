@@ -1,4 +1,5 @@
-clear, clc
+clear,clc
+
 % this .m is to verify Inverse effecitve resitance problem:
 % Given an effective resitance matrix D, we are planning to obtain a network
 % whose effective resitance is similar with given demand matrix
@@ -12,7 +13,6 @@ clear, clc
 % 6. update the \Omega
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
-N_vec = [10, 20, 50, 100, 200];
 N_vec = [100];
 p_start_vec = zeros(4,1);
 count = 1; 
@@ -85,36 +85,6 @@ function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_
     Norm_output = sum(sum((abs(D - output_Omega))./(D+(D==0))))/(N*(N-1));
 end
 
-
-
-
-function T = generate_a_tree(N,minlinkweight,maxlinkweight)
-% 生成完全连接的随机加权图
-W = randi([minlinkweight,maxlinkweight], N, N);  % 生成 1-10 之间的随机整数
-W = triu(W,1);            % 仅保留上三角部分以避免重复
-W = W + W';               % 生成对称矩阵，表示无向图
-% 计算最小生成树
-G = graph(W);             % 生成图
-T = minspantree(G);       % 计算最小生成树
-T.Edges.Weight = randi([minlinkweight,maxlinkweight], numedges(T), 1);
-end
-
-function A = ISPP_tree(Omega)
-m = size(Omega,1);
-u = ones(m,1);
-p = 1/(u.'*inv(Omega)*u)*inv(Omega)*u;
-Q_tilde = 2*(u.'*inv(Omega)*u)*p*p.'-2*inv(Omega);
-A = diag(diag(Q_tilde)) - Q_tilde;
-A = round(A, 10);
-A(A ~= 0) = 1 ./ A(A ~= 0);
-end
-
-function Omega = EffectiveResitance_withinverseA(A)
-% the resitance is the inverse of the link weight
-    Aforomega = A;
-    Aforomega(Aforomega ~= 0) = 1 ./ Aforomega(Aforomega ~= 0);
-    Omega = EffectiveResistance(Aforomega);
-end
 
 
 function A = GenerateERfast(n,p,weighted)
