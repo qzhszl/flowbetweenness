@@ -3,9 +3,14 @@ filefolder_name = "D:\\data\\flow betweenness\\";
 
 p_vec = [0.03,0.04,0.06,0.11,0.15,0.28,0.39,0.66,0.88];
 
-n = 50;
-p = 0.08;
-resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
+n = 1000;
+p = 0.01;
+weighted_flag = 1;
+if weighted_flag==0
+    resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
+else
+    resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
+end
 filename = filefolder_name+resname;
 
 % load_and_plot_powerdissipation.m
@@ -95,8 +100,11 @@ box on
 % set(fig, 'Color', 'none');              % figure 背景透明
 % set(gca,  'Color', 'none');             % 坐标轴区域背景透明
 hold off
-
-picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_N%d_p%.2f.pdf",n,p);
+if weighted_flag==0
+    picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_N%d_p%.2f.pdf",n,p);
+else
+    picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_N%d_p%.2f_weighted.pdf",n,p);
+end
 % exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
 print(fig, picname, '-dpdf', '-r600', '-bestfit');
 
