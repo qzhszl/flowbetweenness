@@ -52,14 +52,14 @@ function [output_Atilde,output_Omega] = IERP(D)
     end
     output_Atilde = W;
     output_Omega = EffectiveResitance_withinverseA(W);
-
-    
-
+    alpha = alpha_l1_global_para(output_Omega,D);
+    output_Omega = alpha*output_Omega;
+    output_Atilde = alpha*output_Atilde;
 end
 
-function Omega = EffectiveResitance_withinverseA(A)
-% the resitance is the inverse of the link weight
-    Aforomega = A;
-    Aforomega(Aforomega ~= 0) = 1 ./ Aforomega(Aforomega ~= 0);
-    Omega = EffectiveResistance(Aforomega);
-end
+% function Omega = EffectiveResitance_withinverseA(A)
+% % the resitance is the inverse of the link weight
+%     Aforomega = A;
+%     Aforomega(Aforomega ~= 0) = 1 ./ Aforomega(Aforomega ~= 0);
+%     Omega = EffectiveResistance(Aforomega);
+% end

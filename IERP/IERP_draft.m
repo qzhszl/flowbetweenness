@@ -36,15 +36,16 @@ while ~connect_flag
     % check connectivity
     connect_flag = network_isconnected(A_input);
 end
-A_input = [0,0.5,0
-    0.5 0 1
-    0 1 0
-    ]
-Omega = EffectiveResistance(A_input)
-A = ISPP_tree(Omega)
+% A_input = [0,0.5,0
+%     0.5 0 1
+%     0 1 0
+%     ]
+% Omega = EffectiveResistance(A_input)
+% A = ISPP_tree(Omega)
 % diff = find(abs(A-A_input)>0.000001)
 
 % 2. run simulations
+A_input(A_input ~= 0) = 1 ./ A_input(A_input ~= 0);
 [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_ER(A_input);
 
 
@@ -118,7 +119,8 @@ end
 
 
 function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_ER(A_input)
-    Input_Omega = EffectiveResitance_withinverseA(A_input);
+    % Input_Omega = EffectiveResitance_withinverseA(A_input);
+    Input_Omega = EffectiveResistance(A_input);
     % Generate a demand matrix: the effective resistance matrix of the
     % input network
     D = Input_Omega;
