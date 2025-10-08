@@ -13,48 +13,107 @@ clear,clc
 % 6. update the \Omega
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
-N_vec = [100];
+N = 20
 p_start_vec = zeros(4,1);
 count = 1; 
-for N = N_vec
-    p_start_vec(count) = round(log(N)/N,4);
-    count = count+1;
-end
+p = 0.2
 
 simutimes = 1;
 count =1;
-for N = N_vec
-    N
-    result = zeros(simutimes,4);
-    p_vec = linspace(p_start_vec(count), 1, 15);
-    p_vec = round(p_vec,4);
-    for p= p_vec
-        p
-        for simu_time = 1:simutimes
-%             simu_time
-            % 1. generate a graph
-            % _________________________________________________________________________
-            % (b) ER:
-            A_input = GenerateERfast(N,p,10);
-            % check connectivity
-            connect_flag = network_isconnected(A_input);
-            while ~connect_flag
-                A_input = GenerateERfast(N,p,10);
-                % check connectivity
-                connect_flag = network_isconnected(A_input);
-            end
 
-            % 2. run simulations
-            [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_ER(A_input);
-            
-            result(simu_time,:) = [L_add_output,L_ouput,L_comm_output,Norm_output];
-        end
-        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_weight01.txt",N,p);
-%         writematrix(result,filename)
-    end
-    count = count+1;
+result = zeros(simutimes,4);
+p_vec = linspace(p_start_vec(count), 1, 15);
+p_vec = round(p_vec,4);
+    
+% 1. generate a graph
+% _________________________________________________________________________
+% (b) ER:
+A_input = GenerateERfast(N,p,10);
+% check connectivity
+connect_flag = network_isconnected(A_input);
+while ~connect_flag
+    A_input = GenerateERfast(N,p,10);
+    % check connectivity
+    connect_flag = network_isconnected(A_input);
+end
+A_input = [0,0.5,0
+    0.5 0 1
+    0 1 0
+    ]
+Omega = EffectiveResistance(A_input)
+A = ISPP_tree(Omega)
+% diff = find(abs(A-A_input)>0.000001)
+
+% 2. run simulations
+[L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_ER(A_input);
+
+
+
+function A = ISPP_tree(Omega)
+    m = size(Omega,1);
+    u = ones(m,1);
+    p = 1/(u.'*inv(Omega)*u)*inv(Omega)*u;
+    Q_tilde = 2*(u.'*inv(Omega)*u)*p*p.'-2*inv(Omega);
+    A = diag(diag(Q_tilde)) - Q_tilde;
+    A = round(A, 10);
+    % A(A ~= 0) = 1 ./ A(A ~= 0);
 end
 
+
+
+function [output_Atilde,output_Omega] = IERP_2(D)
+    N = size(D,1);
+    Input_Omega = D
+    W_tilde  = Input_Omega;
+    W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);
+    Omega_new = EffectiveResistance(W_tilde)  ;          % Compute the effective resistance Omega
+    R_G1 = sum(sum(Input_Omega))
+    
+    
+    diff_change = sum(sum((abs(D - Omega_new))./(D+(D==0))))/(N*(N-1));
+
+    % val = 1;
+    flag = 1;
+    A = (W_tilde > 0);
+    % Gnow = graph(W_tilde,"upper");
+    while(flag==1)                     % Remove links one by one until we exceed the constraints                            
+        previous_change = diff_change;
+        % method 1 R = A.*((Omega_new+eye(N)).^-1 - W_tilde)*(D-Omega_new) 
+        R = A.*((Omega_new+eye(N)).^-1 - W_tilde).*(D-Omega_new);     % Compute R
+        [val,~] = max(max(R));                              % Identify the maximum element
+        [row,col] = find(R == val);                        % Identify the link
+        A(row(1),col(1)) = 0; A(col(1),row(1)) = 0;        % Remove the link
+        W_tilde = A.*D;
+        W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);      % Compute W tilde
+        % Gnow = graph(W_tilde,"upper");
+        Omega_new = EffectiveResistance(W_tilde);               % Update the shortest path weight matrix
+        
+        diff_change = sum(sum((abs(D - Omega_new))./(D+(D==0))))/(N*(N-1));
+
+        if abs(diff_change) > abs(previous_change)
+            flag=0;
+        end    
+    end
+    
+    if(row(1) ~= col(1))
+        A(row(1),col(1)) = 1; A(col(1),row(1)) = 1;         % Return lastly removed link
+        W = A.*D;
+    %     W = 2*1/sum(sum(A.*D)).*A.*D;                       % Update the weighted adjacency matrix
+    end
+    % output_Atilde = W;
+    output_Omega = EffectiveResitance_withinverseA(W);
+    R_G3 = sum(sum(output_Omega));
+    alpha = alpha_l1_global2(output_Omega,D)
+    output_Omega = alpha*output_Omega
+
+    output_Atilde = ISPP_tree(output_Omega);
+    output_Atilde(output_Atilde ~= 0) = 1 ./ output_Atilde(output_Atilde ~= 0);
+    output_Atilde
+    output_Atilde2 = W
+    % output_Atilde2(output_Atilde2 ~= 0) = 1 ./ output_Atilde2(output_Atilde2 ~= 0);
+    output_Atilde2 = alpha*output_Atilde2
+    diff = find(abs(output_Atilde2-output_Atilde)>0.00001)
+end
 
 
 
@@ -66,12 +125,12 @@ function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_
     N = size(D,1);
     tic
     [output_Atilde,output_Omega] = IERP(D);
-    t3 = toc
+    t3 = toc;
     tic
-    [output_Atilde2,output_Omega2] = IERP_speedtest(D);
-    t4 = toc
-    data3diff = find(abs(output_Atilde2-output_Atilde)>0.00001)
-    data4diff = find(abs(output_Omega2-output_Omega)>0.00001)
+    [output_Atilde2,output_Omega2] = IERP_2(D);
+    t4 = toc;
+    data3diff = find(abs(output_Atilde2-output_Atilde)>0.00001);
+    data4diff = find(abs(output_Omega2-output_Omega)>0.00001);
     
 
     % Store the results
@@ -82,7 +141,8 @@ function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_
     % 3. The number of common links between two graphs
     L_comm_output_ratio = nnz(A_input.*output_Atilde)/nnz(output_Atilde); 
     % 4. The norm of common links between two graphs
-    Norm_output = sum(sum((abs(D - output_Omega))./(D+(D==0))))/(N*(N-1));
+    Norm_output = sum(sum((abs(D - output_Omega))./(D+(D==0))))/(N*(N-1))
+    Norm_output_2 = sum(sum((abs(D - output_Omega2))./(D+(D==0))))/(N*(N-1))
 end
 
 
@@ -109,4 +169,63 @@ function [isConnected] = network_isconnected(adj)
     components = conncomp(G);
     % 判断图是否连通
     isConnected = (max(components) == 1);
+end
+
+function alpha = alpha_l1_global2(A, D)
+
+    r = D(A>0)./A(A>0);
+    w = A(A>0)./D(A>0);
+    
+    % Sort and find weighted median
+    [rsort, idx] = sort(r(:));
+    w = w(idx);
+    cw = cumsum(w)/sum(w);
+    alpha = rsort(find(cw>=0.5, 1));
+end
+
+
+
+function alpha = alpha_l1_global(A, D)
+% ALPHA_L1_GLOBAL  找到标量 alpha 以最小化 || alpha*A - D ||_1
+%   alpha = alpha_l1_global(A,D)
+% 返回加权中位数解，处理 A==0 的条目（这部分不影响 alpha）。
+%
+% 若所有 A(:)==0，则任意 alpha 都相同，这里返回 0 并发出警告。
+
+a = A(:);
+d = D(:);
+
+% 只保留 a~=0 的项（a==0 的项与 alpha 无关）
+mask = (a ~= 0);
+if ~any(mask)
+    warning('All entries of A are zero. Objective independent of alpha. Return alpha = 0.');
+    alpha = 0;
+    return;
+end
+
+b = d(mask) ./ a(mask);   % 比值 d_i / a_i
+w = abs(a(mask));         % 权重 |a_i|
+
+% 排序 b 并把权重一并排序
+[bs, idx] = sort(b);
+ws = w(idx);
+
+W = sum(ws);
+cumw = cumsum(ws);
+
+% 找到第一个使 cumw >= W/2 的索引
+k = find(cumw >= W/2, 1, 'first');
+
+% 若恰好等于 W/2 且下一个 b 不相同，则任意在 [bs(k), bs(k+1)] 都是最优解。
+% 这里我们返回中点以保证确定性。
+if cumw(k) == W/2 && k < numel(bs)
+    % 若下一个不同则取区间中点，否则等于时取 bs(k)
+    if bs(k) ~= bs(k+1)
+        alpha = 0.5*(bs(k) + bs(k+1));
+    else
+        alpha = bs(k);
+    end
+else
+    alpha = bs(k);
+end
 end

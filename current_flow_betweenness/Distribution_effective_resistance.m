@@ -1,27 +1,34 @@
 clear,clc
-% clear,clc
+% Figure 5(a)(b)(c)
+% graph power dissipation
+
+
+
+% % % Generate an BA network
+%-----------------------------------------------------------
+% G = BAgraph(1000, 4, 3);
 
 % load BA netwok
-% G = BAgraph(1000, 4, 3);
-% n = 1000;
-% m=3; 
-% BA_network_name = sprintf('D:\\data\\flow betweenness\\BAnetworks\\BAnetworkN%dm%d.txt',n,m);
-% data = readmatrix(BA_network_name);  % 每行: u v w
-% BA_flag = 1;
-% 
-% % 提取三列
-% s = data(:,1)+1;    % 起点
-% t = data(:,2)+1;    % 终点
-% w = data(:,3);    % 权重
-% 
-% % 构造无向图（如果是有向图，就用 digraph）
-% G = graph(s, t, w);
-% A = adjacency(G);
-% n = size(A,1);
+%-----------------------------------------------------------
+n = 1000;
+m=3; 
+BA_network_name = sprintf('D:\\data\\flow betweenness\\BAnetworks\\BAnetworkN%dm%d.txt',n,m);
+data = readmatrix(BA_network_name);  % 每行: u v w
+BA_flag = 1;
 
+% 提取三列
+s = data(:,1)+1;    % 起点
+t = data(:,2)+1;    % 终点
+w = data(:,3);    % 权重
+
+% 构造无向图（如果是有向图，就用 digraph）
+G = graph(s, t, w);
+A = adjacency(G);
+n = size(A,1);
+
+% test BA netwok
+%-----------------------------------------------------------
 % [row,col,v]=find(G.Edges.Weight<=0)
-
-
 % deg = degree(G)
 % % h = histogram(deg,60,Normalization="pdf");
 % [counts, edges] = histcounts(deg, 'BinMethod','integers');
@@ -35,17 +42,22 @@ clear,clc
 % set(gca,"YScale", "log")
 % set(gca,"XScale", "log")
 
-% % Generate an ER network
-avg = 10;
 
-target_mean = 2/avg
-target_std = sqrt(2/(avg^3))
 
-n = 50;
-p = avg/(n-1)
-weighted = 0;
-A = GenerateERfast(n,p,weighted);
-BA_flag = 0;
+
+% % % Generate an ER network
+%-----------------------------------------------------------
+% avg = 8;
+% 
+% target_mean = 2/avg
+% target_std = sqrt(2/(avg^3))
+% 
+% n = 1000;
+% p = avg/(n-1);
+% weighted = 0;
+% A = GenerateERfast(n,p,weighted);
+% BA_flag = 0;
+%-----------------------------------------------------------
 
 % 度矩阵与拉普拉斯
 deg = sum(A,2);
@@ -105,7 +117,7 @@ sigma = pd.sigma;
 
 % 2. 画直方图
 fig = figure; 
-fig.Position = [100 100 600 600];
+fig.Position = [100 100 600 450];
 colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 % for count  =1:6
 %     plot(linspace(1,10,10),count*ones(10,1),Color=colors(count))
@@ -117,9 +129,11 @@ histogram(resistances, 50, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 归�
 hold on;
 
 % 3. 画拟合的正态分布曲线
-x = linspace(min(resistances), max(resistances), 200);
-y = normpdf(x, mu, sigma);
-plot(x, y, "Color",'#D08082', 'LineWidth', 5);
+if BA_flag==0 & avg>49
+    x = linspace(min(resistances), max(resistances), 200);
+    y = normpdf(x, mu, sigma);
+    plot(x, y, "Color",'#D08082', 'LineWidth', 5);
+end
 
 ax = gca;  % Get current axis
 ax.FontSize = 30;  % Set font size for tick label
@@ -140,7 +154,8 @@ else
     xlim_ = xlim; ylim_ = ylim;
     dx = 0.05*(xlim_(2)-xlim_(1));   % 横向内缩 2%
     dy = 0.03*(ylim_(2)-ylim_(1));   % 纵向下移 5%
-    str = {'$N = 10^{3}$', '$\gamma = 2.7$'};  % cell 数组自动分两行
+    edstr = sprintf('$E[D] = %d$',2*m);
+    str = {'$N = 10^{3}$',edstr,'$\gamma = 2.7$'};  % cell 数组自动分两行
     text(xlim_(1)+dx, ylim_(2)-dy, str, ...
          'Interpreter','latex', ...
          'VerticalAlignment','top', ...
@@ -148,7 +163,7 @@ else
          'FontSize',30);
 end
 
-if avg>40
+if BA_flag==0 & avg>40 
     dx = 0.02*(xlim_(2)-xlim_(1));
     dy = 0.08*(ylim_(2)-ylim_(1));
     % LaTeX 格式的字符串
@@ -182,5 +197,5 @@ else
 end
 
 % exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
-% print(fig, picname, '-dpdf', '-r600', '-bestfit');
+print(fig, picname, '-dpdf', '-r600', '-bestfit');
 

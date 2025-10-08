@@ -44,13 +44,13 @@ end
 
 % 图像美化
 ax = gca;  % Get current axis
-ax.FontSize = 20;  % Set font size for tick label
+ax.FontSize = 30;  % Set font size for tick label
 % xlim([0.01 0.55])
 % ylim([0.05 0.25])
 % xticks([1 2 3 4])
 % xticklabels({'10','20','50','100'})
-xlabel('$p$',Interpreter='latex',FontSize=24);
-ylabel('$\frac{2}{N(N-1)}(L_H-L_G)$','interpreter','latex',FontSize=30)
+xlabel('$p$',Interpreter='latex',FontSize=40);
+ylabel('$\frac{2}{N(N-1)}(L_H-L_G)$','interpreter','latex',FontSize=40)
 lgd = legend({'$N = 20$', '$N = 50$', '$N = 100$', '$N = 200$'}, 'interpreter','latex','Location', 'northeast',FontSize=30);
 % lgd.NumColumns = 2;
 % set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);

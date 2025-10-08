@@ -16,22 +16,37 @@ N_vec = [10, 20, 50, 100, 200];
 N_vec = [100];
 p_start_vec = zeros(4,1);
 count = 1; 
+% for N = N_vec
+%     x = log(N)/N;
+%     y = ceil(x * 1e4) / 1e4;  % round 4 decimal
+%     p_start_vec(count) = y;
+%     count = count+1;
+% end
 for N = N_vec
     p_start_vec(count) = round(log(N)/N,4);
     count = count+1;
 end
 
-simutimes = 1;
+
+simutimes = 1000;
 count =1;
 for N = N_vec
-    N
     result = zeros(simutimes,4);
     p_vec = linspace(p_start_vec(count), 1, 15);
+    % 前两个点
+    p1 = p_vec(1);
+    p2 = p_vec(2);  
+    % 在 p1 和 p2 之间插入两个点
+    extra_points = linspace(p1, p2, 4);  % 生成4个点
+    extra_points = extra_points(2:3);    % 去掉第一个和最后一个（原本已有）
+    % 合并
+    % p_vec = [p_vec(1), extra_points, p_vec(2:end)];
+    p_vec = extra_points
     p_vec = round(p_vec,4);
     for p= p_vec
-        p
         for simu_time = 1:simutimes
-%             simu_time
+            current_output_s = sprintf("N%d, p%.4f: %d/%d",N,p,simu_time,simutimes);
+            disp(current_output_s)
             % 1. generate a graph
             % _________________________________________________________________________
             % (b) ER:
@@ -49,8 +64,8 @@ for N = N_vec
             
             result(simu_time,:) = [L_add_output,L_ouput,L_comm_output,Norm_output];
         end
-        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_weight01.txt",N,p);
-%         writematrix(result,filename)
+        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f.txt",N,p);
+        writematrix(result,filename)
     end
     count = count+1;
 end
@@ -59,19 +74,21 @@ end
 
 
 function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_ER(A_input)
+    % ensure the input link weight change from 0,1
     Input_Omega = EffectiveResitance_withinverseA(A_input);
+    
     % Generate a demand matrix: the effective resistance matrix of the
     % input network
     D = Input_Omega;
     N = size(D,1);
-    tic
+    % tic
     [output_Atilde,output_Omega] = IERP(D);
-    t3 = toc
-    tic
-    [output_Atilde2,output_Omega2] = IERP_speedtest(D);
-    t4 = toc
-    data3diff = find(abs(output_Atilde2-output_Atilde)>0.00001)
-    data4diff = find(abs(output_Omega2-output_Omega)>0.00001)
+    % t3 = toc
+    % tic
+    % [output_Atilde2,output_Omega2] = IERP_speedtest(D);
+    % t4 = toc
+    % data3diff = find(abs(output_Atilde2-output_Atilde)>0.00001)
+    % data4diff = find(abs(output_Omega2-output_Omega)>0.00001)
     
 
     % Store the results

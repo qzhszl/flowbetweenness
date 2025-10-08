@@ -1,12 +1,70 @@
 clear,clc
-filefolder_name = "D:\\data\\flow betweenness\\";
 
-n = 200;
+weighted_flag =0;
+color_count = 1;
+
+
+fig = figure; 
+fig.Position = [100 100 900 600];
+nvec = [100,200,1000]
+for n = nvec
+    if n==1000
+        s = plot_elvsp(n,weighted_flag,1,color_count);
+    else
+        plot_elvsp(n,weighted_flag,0,color_count)
+    end
+    color_count = color_count+1;
+end
+
+
+set(gca,"XScale", "log")
+set(gca,"YScale", "log")
+
+xlabel('$p$','interpreter','latex','FontSize',50)
+ylabel('$E[\Lambda_l]$','interpreter','latex','FontSize',50);
+
+
+ax = gca;  % Get current axis
+ax.FontSize = 30;  % Set font size for tick label
+ylim([1e-12 5e-2])
+% xlim([0.05 0.25])
+% xticks([1 2 3 4])
+% xticklabels({'10','20','50','100'})
+if length(nvec)>1
+    lgd = legend({'simultion:$\Lambda_l$, $N=100$', 'simultion:$\Lambda_l$, $N=200$', 'simultion:$\Lambda_l$, $N=1000$',s}, 'interpreter','latex','Location', 'best',FontSize=26);
+    lgd.Position = [0.39, 0.29, 0.15, 0.15];
+    lgd.ItemTokenSize = [40,10];
+else
+    lgd = legend({sprintf('simultion:$\\Lambda_l$, $N=%d$',n), s}, 'interpreter','latex','Location', 'best',FontSize=30);
+end
+% lgd.NumColumns = 2;
+% set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
+box on
+% set(fig, 'Color', 'none');              % figure 背景透明
+% set(gca,  'Color', 'none');             % 坐标轴区域背景透明
+hold off
+if weighted_flag ==0
+    picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_N%d_withdiffp_unweighted.pdf",n);
+else
+    picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_N%d_withdiffp.pdf",n);
+end
+% exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
+print(fig, picname, '-dpdf', '-r600', '-bestfit');
+
+
+
+function s = plot_elvsp(n,weighted_flag,curve_fit_flag,color_count)
+filefolder_name = "D:\\data\\flow betweenness\\";
+colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 % p_vec = [0.08,0.1,0.15,0.2,0.28,0.39,0.5,0.66];
 % p_vec=[0.15,0.28,0.39,0.66,0.88]
 % p_vec = [0.05,0.1,0.2,0.5]
 if n == 200
     p_vec = [0.03,0.04,0.06,0.11,0.15,0.28,0.39,0.66,0.88];
+elseif n ==100
+    p_vec = [0.05,0.08,0.11,0.15,0.28,0.39,0.66,0.88];
+elseif n == 1000
+    p_vec = [0.007,0.0269,0.0529,0.1037,0.2034,0.3990,0.88];
 end
 
 ave_link_power_vec = zeros(length(p_vec),1);
@@ -15,12 +73,26 @@ std_link_power_vec = zeros(length(p_vec),1);
 count = 0;
 for p = p_vec
     count = count+1;
-    resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
-    filename = filefolder_name+resname;
+    if weighted_flag ==0
+        resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
+        filename = filefolder_name+resname;
+        % load_and_plot_powerdissipation.m
+        try
+            S = load(filename);
+        catch
+            resname  = sprintf('power_dissipation_N%dp%.4fER_unweighted.mat',n,p);
+            filename = filefolder_name+resname;
+            S = load(filename);
+        end
+        results = S.results;
+    else
+        resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
+        filename = filefolder_name+resname;
+        % load_and_plot_powerdissipation.m
+        S = load(filename);
+        results = S.results;
+    end
     
-    % load_and_plot_powerdissipation.m
-    S = load(filename);
-    results = S.results;
     
     % % 2. (1)load and combine data
     total_energy_path = [];
@@ -53,54 +125,31 @@ end
 
 
 % % 3. 画直方图 (分布图)
-fig = figure; 
-fig.Position = [100 100 900 600]; 
-colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
-
-% errorbar(p_vec,ave_link_power_vec,std_link_power_vec,"-o",'LineWidth', 4, 'MarkerSize', 12,color = "#D08082")
-plot(p_vec,ave_link_power_vec,"-o",'LineWidth', 4, 'MarkerSize', 12,color = "#D08082")
+errorbar(p_vec,ave_link_power_vec,std_link_power_vec,"-o",'LineWidth', 4, 'MarkerSize', 12,color = colors(color_count))
+% plot(p_vec,ave_link_power_vec,"-o",'LineWidth', 4, 'MarkerSize', 12,color = colors(color_count))
 hold on
 
-% curve fit................
-xdata = p_vec(:);
-ydata = ave_link_power_vec(:);
-% 定义幂律拟合模型：y = a*x^b
-X = log(xdata(3:length(xdata)));
-Y = log(ydata(3:length(xdata)));
+if curve_fit_flag == 1
+    % curve fit................
+    xdata = p_vec(:);
+    ydata = ave_link_power_vec(:);
+    % 定义幂律拟合模型：y = a*x^b
+    X = log(xdata(3:length(xdata)));
+    Y = log(ydata(3:length(xdata)));
+    
+    coeff = polyfit(X, Y, 1);   % 拟合直线 Y = b*X + log(a)
+    
+    b = coeff(1);
+    loga = coeff(2);
+    a = exp(loga);
+    plot(xdata, a*xdata.^b, '--','Color','#D9B382','LineWidth',5)
+    s = sprintf('fit: $E[\\Lambda_l] = %.2e p^{%.3g}$', a, b);
+    s = regexprep(s, 'e([+-]?\d+)', '\\times 10^{$1}');
+    s = regexprep(s, '\^\{\+(\d+)\}', '^{$1}') ; % 去掉正号
+    s = regexprep(s, '\^\{(-?)0+(\d+)\}', '^{$1$2}');
+end
+end
 
-coeff = polyfit(X, Y, 1);   % 拟合直线 Y = b*X + log(a)
-
-b = coeff(1);
-loga = coeff(2);
-a = exp(loga);
-
-plot(xdata, a*xdata.^b, '--','Color','#7A7DB1','LineWidth',5)
-
-
-set(gca,"XScale", "log")
-set(gca,"YScale", "log")
-
-xlabel('$p$','interpreter','latex','FontSize',30)
-ylabel('$E[E_l]$','interpreter','latex','FontSize',30);
-
-
-ax = gca;  % Get current axis
-ax.FontSize = 20;  % Set font size for tick label
-% xlim([0.01 0.55])
-% ylim([0.05 0.25])
-% xticks([1 2 3 4])
-% xticklabels({'10','20','50','100'})
-lgd = legend({'link power dissipation', sprintf('fit: $y = %.2g x^{%.3g}$', a, b)}, 'interpreter','latex','Location', 'best',FontSize=30);
-% lgd.NumColumns = 2;
-% set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
-box on
-% set(fig, 'Color', 'none');              % figure 背景透明
-% set(gca,  'Color', 'none');             % 坐标轴区域背景透明
-hold off
-
-picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_N%d_withdiffp.pdf",n);
-% exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
-print(fig, picname, '-dpdf', '-r600', '-bestfit');
     
  
 

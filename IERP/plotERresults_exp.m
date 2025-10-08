@@ -1,10 +1,8 @@
 clear,clc
-old_flag = 1;
 N_vec = [20, 50, 100, 200];
 N_vec = [50];
 p_start_vec = zeros(length(N_vec),1);
-countN = 1;
-
+countN = 1; 
 for N = N_vec
     p_start_vec(countN) = round(log(N)/N,4);
     countN = countN+1;
@@ -15,25 +13,11 @@ data_std = zeros(length(N_vec),2);
 countN = 1;
 
 for N = N_vec
-    % p_vec = linspace(p_start_vec(countN), 1, 15);
-    % p_vec = round(p_vec,4);
-    
-    % more points in the beginning
     p_vec = linspace(p_start_vec(countN), 1, 15);
-    % 前两个点
-    p1 = p_vec(1);
-    p2 = p_vec(2);  
-    % 在 p1 和 p2 之间插入两个点
-    extra_points = linspace(p1, p2, 4);  % 生成4个点
-    extra_points = extra_points(2:3);    % 去掉第一个和最后一个（原本已有）
-    % 合并
-    p_vec = [p_vec(1), extra_points, p_vec(2:end)];
     p_vec = round(p_vec,4);
-
-
     countp = 1;
     for p= p_vec
-        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f.txt",N,p);
+        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_weight_exp.txt",N,p);
         results = readmatrix(filename);
         results = results(:,4);
         mean_values = mean(results);
@@ -52,22 +36,8 @@ colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 
 
 for countplot = 1:length(N_vec)
-    % p_vec = linspace(p_start_vec(countplot), 1, 15);
-    % p_vec = round(p_vec,4);
-
-
-    % more points in the beginning
     p_vec = linspace(p_start_vec(countplot), 1, 15);
-    % 前两个点
-    p1 = p_vec(1);
-    p2 = p_vec(2);  
-    % 在 p1 和 p2 之间插入两个点
-    extra_points = linspace(p1, p2, 4);  % 生成4个点
-    extra_points = extra_points(2:3);    % 去掉第一个和最后一个（原本已有）
-    % 合并
-    p_vec = [p_vec(1), extra_points, p_vec(2:end)];
     p_vec = round(p_vec,4);
-
     errorbar(p_vec, data_mean(:,countplot), data_std(:,countplot), 'o-', 'Color', colors(countplot), 'LineWidth', 4, 'MarkerSize', 10,'CapSize',8);
 end
 
@@ -88,5 +58,5 @@ ylabel('$\|D-\Omega\|$','interpreter','latex',FontSize=40)
 box on
 hold off
 
-picname = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_ER_norm.pdf");
-% exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
+picname = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_ER_norm_exp.pdf");
+exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);

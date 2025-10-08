@@ -2,8 +2,12 @@ clear,clc
 filefolder_name = "D:\\data\\flow betweenness\\";
 
 weigthed_flag = 0;
-n_vec = [77,100,120,287,444,686,1062,1643];
 n_vec = [77,120,287,444,686,1062];
+% n_vec = [77,120,287,444,686,1062];
+% for n = n_vec
+%     avg = 20;
+%     p = avg/(n-1)
+% end
 
 
 ave_link_power_vec = zeros(length(n_vec),1);

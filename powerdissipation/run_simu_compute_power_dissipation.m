@@ -18,13 +18,22 @@ clear,clc
 % [power_givenst_flow,EdgeEnergy_flow] = compute_flownetwork_power_dissipation(G,1,3)
 
 % EdgeEnergy_SP = addvars(G.Edges, EdgeEnergy_SP, 'NewVariableNames',"Energy_SP")
+% logspace(0.05,0.88,8)
 
+% for N = [50,77,120,200,287,444]
+%     % for p=[0.15,0.28,0.39,0.66,0.88]
+%     avg = [10,20,50];
+%     for p=avg/(N-1)
+%         compute_power_dissipation_eachlink(N,p,10,0)
+%     end
+% end
 
-for N = 50
-    % for p=[0.15,0.28,0.39,0.66,0.88]
-    avg = [];
-    for p=[0.1]
-        compute_power_dissipation_eachlink(N,p,100,1)
+for N = [686]
+    for p=[0.2,0.5]
+    % for p=[0.05,0.08,0.11,0.15,0.28,0.39,0.66,0.88]
+    % avg = [10,20,50];
+    % for p=avg/(N-1)
+        compute_power_dissipation_eachlink(N,p,1,0)
     end
 end
 

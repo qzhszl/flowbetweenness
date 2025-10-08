@@ -24,6 +24,15 @@ for k = 1:simu_times
     % ---- 生成 ER 图 ----
     A =  GenerateERfast(n,p,weighted);
     G = graph(A);  % 无向图
+    ind_conn = 1;
+    while(ind_conn) % Until a connected graph is created
+        A = GenerateERfast(n,p,weighted);       
+        G = graph(A);
+        if(sum(conncomp(G)) == n)
+            ind_conn = 0;
+        end
+    end
+
 %     figure;
 %     plot(G,'EdgeLabel',G.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
 % 'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);

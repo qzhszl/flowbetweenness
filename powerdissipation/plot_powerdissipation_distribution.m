@@ -3,13 +3,25 @@ filefolder_name = "D:\\data\\flow betweenness\\";
 
 p_vec = [0.03,0.04,0.06,0.11,0.15,0.28,0.39,0.66,0.88];
 
-n = 1000;
-p = 0.01;
-weighted_flag = 1;
-if weighted_flag==0
-    resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
+BA_flag = 0;
+weighted_flag = 0;
+
+if BA_flag ==0
+    n = 1000;
+    p = 0.05;
+    if weighted_flag==0
+        resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
+    else
+        resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
+    end
 else
-    resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
+    n = 1000;
+    m = 3;
+    if weighted_flag==0
+        resname  = sprintf('power_dissipation_N%dm%d_uniweghted.mat',n,m);
+    else
+        resname  = sprintf('power_dissipation_N%dm%d.mat',n,m);
+    end
 end
 filename = filefolder_name+resname;
 
@@ -58,7 +70,7 @@ link_energy_flow = link_energy_flow./nchoosek(n,2);
 
 % % 3. 画直方图 (分布图)
 fig = figure; 
-fig.Position = [100 100 900 600]; 
+fig.Position = [100 100 600 450];
 colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 
 % histogram(link_energy_path, 60, 'Normalization', 'pdf', FaceColor='#D08082'); % 50 bins
@@ -72,23 +84,57 @@ numBins = 50;
 validIdx = counts > 3;
 validEdges = edges([find(validIdx), find(validIdx)+1]);
 link_energy_flow = link_energy_flow(link_energy_flow >= 0 & link_energy_flow <= max(validEdges));
-h = histogram(link_energy_flow, 30, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
+h = histogram(link_energy_flow, 50, 'Normalization', 'pdf', FaceColor='#7A7DB1'); % 50 bins
 hold on
-[counts, edges] = histcounts(link_energy_flow, 30, 'Normalization', 'pdf');
-centers = (edges(1:end-1) + edges(2:end)) / 2;
-plot(centers,counts)
-
-hold on
+% [counts, edges] = histcounts(link_energy_flow, 60, 'Normalization', 'pdf');
+% centers = (edges(1:end-1) + edges(2:end)) / 2;
+% plot(centers,counts)
+% hold on
 
 % set(gca,"XScale", "log")
 % set(gca,"YScale", "log")
 
-ylabel('$f_{\Lambda_l}(x)$','interpreter','latex','FontSize',30)
-xlabel('$x$','interpreter','latex','FontSize',30);
-
+ylabel('$f_{\Lambda_l}(x)$','interpreter','latex','FontSize',40)
+xlabel('$x$','interpreter','latex','FontSize',40);
 
 ax = gca;  % Get current axis
-ax.FontSize = 20;  % Set font size for tick label
+ax.FontSize = 30;  % Set font size for tick label
+box on
+
+if BA_flag==0
+    ax.YAxis.Exponent = 6;   % 表示显示为 x × 10^3
+    ax.YRuler.SecondaryLabel.FontSize = 20;
+    ax.XAxis.Exponent = -4;   % 表示显示为 x × 10^3
+    ax.XRuler.SecondaryLabel.FontSize = 20;
+    xlim_ = xlim; ylim_ = ylim;
+    dx = 0.02*(xlim_(2)-xlim_(1));   % 横向内缩 2%
+    dy = 0.03*(ylim_(2)-ylim_(1));   % 纵向下移 5%
+    avg = n*p;
+    edstr = sprintf('$E[D] = %d$',avg);
+    str = {'$N = 10^{3}$', edstr};  % cell 数组自动分两行
+    text(xlim_(2)-dx, ylim_(2)-dy, str, ...
+         'Interpreter','latex', ...
+         'VerticalAlignment','top', ...
+         'HorizontalAlignment','right', ...
+         'FontSize',30);
+else
+    ax.YAxis.Exponent = 3;   % 表示显示为 x × 10^3
+    ax.YRuler.SecondaryLabel.FontSize = 20;
+    ax.XAxis.Exponent = -4;   % 表示显示为 x × 10^3
+    ax.XRuler.SecondaryLabel.FontSize = 20;
+    xlim_ = xlim; ylim_ = ylim;
+    dx = 0.05*(xlim_(2)-xlim_(1));   % 横向内缩 2%
+    dy = 0.03*(ylim_(2)-ylim_(1));   % 纵向下移 5%
+    edstr = sprintf('$E[D] = %d$',2*m);
+    str = {'$N = 10^{3}$',edstr,'$\gamma = 2.7$'};  % cell 数组自动分两行
+    text(xlim_(1)+dx, ylim_(2)-dy, str, ...
+         'Interpreter','latex', ...
+         'VerticalAlignment','top', ...
+         'HorizontalAlignment','left', ...
+         'FontSize',30);
+end
+
+
 % xlim([0.01 0.55])
 % ylim([0.05 0.25])
 % xticks([1 2 3 4])
@@ -96,14 +142,23 @@ ax.FontSize = 20;  % Set font size for tick label
 % lgd = legend({'$N = 20$', '$N = 50$', '$N = 100$', '$N = 200$'}, 'interpreter','latex','Location', 'northwest',FontSize=30);
 % lgd.NumColumns = 2;
 % set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
-box on
 % set(fig, 'Color', 'none');              % figure 背景透明
 % set(gca,  'Color', 'none');             % 坐标轴区域背景透明
+
 hold off
-if weighted_flag==0
-    picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_N%d_p%.2f.pdf",n,p);
+
+if BA_flag==0
+    if weighted_flag==0
+        picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_N%d_p%.2f.pdf",n,p);
+    else
+        picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_N%d_p%.2f_weighted.pdf",n,p);
+    end
 else
-    picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_N%d_p%.2f_weighted.pdf",n,p);
+    if weighted_flag==0
+        picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_BA_N%dm%d.pdf",n,m);
+    else
+        picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_distribution_BA_N%dm%d_weighted.pdf",n,m);
+    end
 end
 % exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
 print(fig, picname, '-dpdf', '-r600', '-bestfit');

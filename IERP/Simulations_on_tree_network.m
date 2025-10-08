@@ -13,6 +13,7 @@ clear, clc
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
 N_vec = [10, 20, 50, 100];
+N_vec = [10]
 simutimes = 1
 for N = N_vec
     result = zeros(simutimes,4);
@@ -35,6 +36,7 @@ end
 
 function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_tree(A_input)
     Input_Omega = EffectiveResitance_withinverseA(A_input);
+    % Input_Omega = EffectiveResitance(A_input);
     % Generate a demand matrix: the effective resistance matrix of the
     % input network
     D = Input_Omega;
