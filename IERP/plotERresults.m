@@ -1,7 +1,7 @@
 clear,clc
 old_flag = 1;
 N_vec = [20, 50, 100, 200];
-N_vec = [50];
+N_vec = [20];
 p_start_vec = zeros(length(N_vec),1);
 countN = 1;
 
@@ -33,7 +33,7 @@ for N = N_vec
 
     countp = 1;
     for p= p_vec
-        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f.txt",N,p);
+        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_linkweight01uniform.txt",N,p);
         results = readmatrix(filename);
         results = results(:,4);
         mean_values = mean(results);

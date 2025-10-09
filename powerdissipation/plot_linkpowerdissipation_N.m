@@ -1,16 +1,16 @@
 clear,clc
 
 
-weigthed_flag = 1;
+weigthed_flag = 0;
 % p = 0.5;
 
 fig = figure; 
 fig.Position = [100 100 900 600]; 
 
 color_count = 1;
-p_vec = [0.1]
+p_vec = [0.1,0.2,0.5]
 for p  = p_vec
-    if p == 0.1
+    if p == 0.5
         s = plot_ELamda_vs_N(p,weigthed_flag,1,color_count);
     else
         plot_ELamda_vs_N(p,weigthed_flag,0,color_count);
@@ -30,12 +30,14 @@ ylabel('$E[\Lambda_l]$','interpreter','latex','FontSize',50);
 ax = gca;  % Get current axis
 ax.FontSize = 30;  % Set font size for tick label
 % xlim([0.01 0.55])
-% ylim([0.05 0.25])
+ylim([5e-9 1])
 % xticks([1 2 3 4])
 % xticklabels({'10','20','50','100'})
 
 if length(p_vec)>1
-    lgd = legend({'simultion:$\Lambda_l$, $p=0.1$', 'simultion:$\Lambda_l$, $p=0.2$', 'simultion:$\Lambda_l$, $p=0.5$',s}, 'interpreter','latex','Location', 'best',FontSize=30);
+    lgd = legend({'simultion:$\Lambda_l$, $p=0.1$', 'simultion:$\Lambda_l$, $p=0.2$', 'simultion:$\Lambda_l$, $p=0.5$',s}, 'interpreter','latex','Location', 'best',FontSize=26);
+    lgd.Position = [0.55, 0.7, 0.15, 0.15];
+    lgd.ItemTokenSize = [40,10];
 else
     lgd = legend({'simultion:$\Lambda_l$, $p=0.1$',s}, 'interpreter','latex','Location', 'best',FontSize=30);
 end
@@ -60,7 +62,7 @@ function [s]=plot_ELamda_vs_N(p,weigthed_flag,curve_fit_flag,color_count)
     colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
     % n_vec = [77,100,120,287,444,686,1062,1643];
     n_vec = [50,77,120,200,287,444,686,1062,1643];
-    % n_vec = [50,77,120,200,287,444];
+    n_vec = [50,77,120,200,287,444,686,1062];
     
     
     ave_link_power_vec = zeros(length(n_vec),1);
@@ -71,14 +73,31 @@ function [s]=plot_ELamda_vs_N(p,weigthed_flag,curve_fit_flag,color_count)
         count = count+1;
         if weigthed_flag==0
             resname  = sprintf('power_dissipation_N%dp%.2fER_unweighted.mat',n,p);
+            filename = filefolder_name+resname;
+            % load_and_plot_powerdissipation.m
+            try
+                S = load(filename);
+            catch
+                resname  = sprintf('power_dissipation_N%dp%.4fER_unweighted.mat',n,p);
+                filename = filefolder_name+resname;
+                S = load(filename);
+            end
+            results = S.results;
+
         else
             resname  = sprintf('power_dissipation_N%dp%.2fER.mat',n,p);
+            filename = filefolder_name+resname;
+            % load_and_plot_powerdissipation.m
+            try
+                S = load(filename);
+            catch
+                resname  = sprintf('power_dissipation_N%dp%.4fER.mat',n,p);
+                filename = filefolder_name+resname;
+                S = load(filename);
+            end
+            results = S.results;
         end
-        filename = filefolder_name+resname;
-        
-        % load_and_plot_powerdissipation.m
-        S = load(filename);
-        results = S.results;
+
         
         % % 2. (1)load and combine data
         total_energy_path = [];

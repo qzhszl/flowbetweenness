@@ -6,26 +6,26 @@ clear, clc
 
 % the main idea is :1. start with a complete graph whose link weight = demand
 % 2. R = \Omega - W_tilde
-% 3. find i,j where reaches the largest R
+% 3. find i,j where reaches tshe largest R
 % 4. remove that link
 % 5. renormalize the link
 % 6. update the \Omega
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
 N_vec = [10, 20, 50, 100, 200];
-N_vec = [100];
-p_start_vec = zeros(4,1);
+N_vec = [20,50];
+p_start_vec = zeros(length(N_vec),1);
 count = 1; 
-% for N = N_vec
-%     x = log(N)/N;
-%     y = ceil(x * 1e4) / 1e4;  % round 4 decimal
-%     p_start_vec(count) = y;
-%     count = count+1;
-% end
 for N = N_vec
-    p_start_vec(count) = round(log(N)/N,4);
+    x = log(N)/N;
+    y = ceil(x * 1e4) / 1e4;  % round 4 decimal
+    p_start_vec(count) = y;
     count = count+1;
 end
+% for N = N_vec
+%     p_start_vec(count) = round(log(N)/N,4);
+%     count = count+1;
+% end
 
 
 simutimes = 1000;
@@ -40,8 +40,8 @@ for N = N_vec
     extra_points = linspace(p1, p2, 4);  % 生成4个点
     extra_points = extra_points(2:3);    % 去掉第一个和最后一个（原本已有）
     % 合并
-    % p_vec = [p_vec(1), extra_points, p_vec(2:end)];
-    p_vec = extra_points
+    p_vec = [p_vec(1), extra_points, p_vec(2:end)];
+    % p_vec = extra_points
     p_vec = round(p_vec,4);
     for p= p_vec
         for simu_time = 1:simutimes
@@ -50,21 +50,22 @@ for N = N_vec
             % 1. generate a graph
             % _________________________________________________________________________
             % (b) ER:
-            A_input = GenerateERfast(N,p,10);
+            A_input = GenerateERfast(N,p,1);
             % check connectivity
             connect_flag = network_isconnected(A_input);
             while ~connect_flag
-                A_input = GenerateERfast(N,p,10);
+                A_input = GenerateERfast(N,p,1);
                 % check connectivity
                 connect_flag = network_isconnected(A_input);
             end
 
             % 2. run simulations
+            % A_input(A_input ~= 0) = 1 ./ A_input(A_input ~= 0);
             [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_ER(A_input);
             
             result(simu_time,:) = [L_add_output,L_ouput,L_comm_output,Norm_output];
         end
-        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f.txt",N,p);
+        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_linkweight01uniform.txt",N,p);
         writematrix(result,filename)
     end
     count = count+1;
@@ -72,10 +73,11 @@ end
 
 
 
-
 function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_ER(A_input)
-    % ensure the input link weight change from 0,1
-    Input_Omega = EffectiveResitance_withinverseA(A_input);
+    % % ensure the input link weight change from 0,1
+    % Input_Omega = EffectiveResitance_withinverseA(A_input);
+
+    Input_Omega = EffectiveResistance(A_input);
     
     % Generate a demand matrix: the effective resistance matrix of the
     % input network

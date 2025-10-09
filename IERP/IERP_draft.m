@@ -13,10 +13,10 @@ clear,clc
 % 6. update the \Omega
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
-N = 20
+N = 10
 p_start_vec = zeros(4,1);
 count = 1; 
-p = 0.2
+p = 0.3
 
 simutimes = 1;
 count =1;
@@ -68,7 +68,6 @@ function [output_Atilde,output_Omega] = IERP_2(D)
     W_tilde  = Input_Omega;
     W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);
     Omega_new = EffectiveResistance(W_tilde)  ;          % Compute the effective resistance Omega
-    R_G1 = sum(sum(Input_Omega))
     
     
     diff_change = sum(sum((abs(D - Omega_new))./(D+(D==0))))/(N*(N-1));
@@ -84,16 +83,27 @@ function [output_Atilde,output_Omega] = IERP_2(D)
         [val,~] = max(max(R));                              % Identify the maximum element
         [row,col] = find(R == val);                        % Identify the link
         A(row(1),col(1)) = 0; A(col(1),row(1)) = 0;        % Remove the link
-        W_tilde = A.*D;
-        W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);      % Compute W tilde
-        % Gnow = graph(W_tilde,"upper");
-        Omega_new = EffectiveResistance(W_tilde);               % Update the shortest path weight matrix
         
+        %test: update here
+        
+        W_tilde = A.*D
+        W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0)     % Compute W tilde
+        
+        Omega_new = EffectiveResistance(W_tilde)              % Update the shortest path weight matrix
+        
+        alpha = alpha_l1_global2(Omega_new,D)
+        
+
+        Omega_new = alpha*Omega_new
+        W_tilde = 1/alpha* W_tilde
+        
+
         diff_change = sum(sum((abs(D - Omega_new))./(D+(D==0))))/(N*(N-1));
 
         if abs(diff_change) > abs(previous_change)
             flag=0;
-        end    
+        end
+
     end
     
     if(row(1) ~= col(1))
@@ -103,17 +113,18 @@ function [output_Atilde,output_Omega] = IERP_2(D)
     end
     % output_Atilde = W;
     output_Omega = EffectiveResitance_withinverseA(W);
-    R_G3 = sum(sum(output_Omega));
     alpha = alpha_l1_global2(output_Omega,D)
+    alpha2 = alpha_l1_global3(output_Omega,D)
     output_Omega = alpha*output_Omega
+    
 
-    output_Atilde = ISPP_tree(output_Omega);
-    output_Atilde(output_Atilde ~= 0) = 1 ./ output_Atilde(output_Atilde ~= 0);
-    output_Atilde
-    output_Atilde2 = W
+    % output_Atilde = ISPP_tree(output_Omega);
+    % output_Atilde(output_Atilde ~= 0) = 1 ./ output_Atilde(output_Atilde ~= 0);
+    % output_Atilde
+    output_Atilde = W;
     % output_Atilde2(output_Atilde2 ~= 0) = 1 ./ output_Atilde2(output_Atilde2 ~= 0);
-    output_Atilde2 = alpha*output_Atilde2
-    diff = find(abs(output_Atilde2-output_Atilde)>0.00001)
+    output_Atilde = alpha*output_Atilde
+    % diff = find(abs(output_Atilde2-output_Atilde)>0.00001)
 end
 
 
@@ -183,6 +194,13 @@ function alpha = alpha_l1_global2(A, D)
     w = w(idx);
     cw = cumsum(w)/sum(w);
     alpha = rsort(find(cw>=0.5, 1));
+end
+
+function alpha = alpha_l1_global3(A, D)
+
+    r = D(A>0)./A(A>0);
+    
+    alpha = mean(r);
 end
 
 

@@ -1,10 +1,8 @@
 % Most recent one: Include link weighT change
 
-
 % this .m is to verify Inverse effecitve resitance problem:
 % Given an effective resitance matrix D, we are planning to obtain a network
 % whose effective resitance is similar with given demand matrix
-
 
 % the main idea is :1. start with a complete graph whose link weight = demand
 % 2. R = \Omega - W_tilde
@@ -56,10 +54,3 @@ function [output_Atilde,output_Omega] = IERP(D)
     output_Omega = alpha*output_Omega;
     output_Atilde = alpha*output_Atilde;
 end
-
-% function Omega = EffectiveResitance_withinverseA(A)
-% % the resitance is the inverse of the link weight
-%     Aforomega = A;
-%     Aforomega(Aforomega ~= 0) = 1 ./ Aforomega(Aforomega ~= 0);
-%     Omega = EffectiveResistance(Aforomega);
-% end
