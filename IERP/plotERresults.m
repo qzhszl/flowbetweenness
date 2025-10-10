@@ -1,7 +1,7 @@
 clear,clc
 old_flag = 1;
 N_vec = [20, 50, 100, 200];
-N_vec = [20];
+N_vec = [20,50,100,200];
 p_start_vec = zeros(length(N_vec),1);
 countN = 1;
 
@@ -29,11 +29,11 @@ for N = N_vec
     % 合并
     p_vec = [p_vec(1), extra_points, p_vec(2:end)];
     p_vec = round(p_vec,4);
-
+    p_vec =p_vec(1:6)
 
     countp = 1;
     for p= p_vec
-        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_linkweight01uniform.txt",N,p);
+        filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f.txt",N,p);
         results = readmatrix(filename);
         results = results(:,4);
         mean_values = mean(results);
@@ -68,7 +68,7 @@ for countplot = 1:length(N_vec)
     p_vec = [p_vec(1), extra_points, p_vec(2:end)];
     p_vec = round(p_vec,4);
 
-    errorbar(p_vec, data_mean(:,countplot), data_std(:,countplot), 'o-', 'Color', colors(countplot), 'LineWidth', 4, 'MarkerSize', 10,'CapSize',8);
+    errorbar(p_vec(1:6), data_mean(:,countplot), data_std(:,countplot), 'o-', 'Color', colors(countplot), 'LineWidth', 4, 'MarkerSize', 10,'CapSize',8);
 end
 
 

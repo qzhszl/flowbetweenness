@@ -48,8 +48,8 @@ if weighted_flag ==0
 else
     picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_N%d_withdiffp.pdf",n);
 end
-% exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
-print(fig, picname, '-dpdf', '-r600', '-bestfit');
+exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
+% print(fig, picname, '-dpdf', '-r600', '-bestfit');
 
 
 
@@ -60,11 +60,13 @@ colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 % p_vec=[0.15,0.28,0.39,0.66,0.88]
 % p_vec = [0.05,0.1,0.2,0.5]
 if n == 200
-    p_vec = [0.03,0.04,0.06,0.11,0.15,0.28,0.39,0.66,0.88];
+    % p_vec = [0.03,0.04,0.06,0.11,0.15,0.28,0.39,0.66,0.88];
+    p_vec = [0.03, 0.05, 0.07, 0.11, 0.16, 0.25, 0.38, 0.58, 0.88];
 elseif n ==100
-    p_vec = [0.05,0.08,0.11,0.15,0.28,0.39,0.66,0.88];
+    % p_vec = [0.05,0.06,0.08,0.11,0.15,0.28,0.39,0.66,0.88];
+    p_vec = [0.05,0.07, 0.10, 0.15, 0.21, 0.30, 0.43, 0.61, 0.88];
 elseif n == 1000
-    p_vec = [0.007,0.0137,0.0269,0.0529,0.1037,0.2034,0.3990,0.88];
+    p_vec = [0.007,0.013,0.0269,0.0529,0.1037,0.2034,0.3990,0.88];
 end
 
 ave_link_power_vec = zeros(length(p_vec),1);

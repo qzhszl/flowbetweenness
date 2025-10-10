@@ -54,7 +54,7 @@ for p= p_vec
         
         result(simu_time,:) = [L_add_output,L_ouput,L_comm_output,Norm_output];
     end
-    filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f.txt",N,p);
+    filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%_simu%d.4f.txt",N,p,inputpara);
     writematrix(result,filename)
 end
 

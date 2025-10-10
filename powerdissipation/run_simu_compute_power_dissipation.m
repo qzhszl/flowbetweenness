@@ -28,12 +28,12 @@ clear,clc
 %     end
 % end
 
-for N = [686]
-    for p=[0.2,0.5]
+for N = [200]
+    for p=[0.05, 0.07, 0.11, 0.16, 0.25, 0.38, 0.58]
     % for p=[0.05,0.08,0.11,0.15,0.28,0.39,0.66,0.88]
     % avg = [10,20,50];
     % for p=avg/(N-1)
-        compute_power_dissipation_eachlink(N,p,1,0)
+        compute_power_dissipation_eachlink(N,p,10,0)
     end
 end
 

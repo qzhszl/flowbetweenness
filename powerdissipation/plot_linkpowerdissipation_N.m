@@ -53,8 +53,8 @@ if weigthed_flag ==1
 else
     picname = sprintf("D:\\data\\flow betweenness\\power_dissipation\\link_power_p%.2f_withdiffN_unweighted.pdf",p);
 end
-% exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
-print(fig, picname, '-dpdf', '-r600', '-bestfit');
+exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
+% print(fig, picname, '-dpdf', '-r600', '-bestfit');
 
 
 function [s]=plot_ELamda_vs_N(p,weigthed_flag,curve_fit_flag,color_count)
@@ -62,7 +62,7 @@ function [s]=plot_ELamda_vs_N(p,weigthed_flag,curve_fit_flag,color_count)
     colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
     % n_vec = [77,100,120,287,444,686,1062,1643];
     n_vec = [50,77,120,200,287,444,686,1062,1643];
-    n_vec = [50,77,120,200,287,444,686,1062];
+    % n_vec = [50,77,120,200,287,444,686,1062];
     
     
     ave_link_power_vec = zeros(length(n_vec),1);
