@@ -85,17 +85,17 @@ function [output_Atilde,output_Omega] = IERP_2(D)
         A(row(1),col(1)) = 0; A(col(1),row(1)) = 0;        % Remove the link
         
         %test: update here
-        
-        W_tilde = A.*D
-        W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0)     % Compute W tilde
-        
-        Omega_new = EffectiveResistance(W_tilde)              % Update the shortest path weight matrix
-        
-        alpha = alpha_l1_global2(Omega_new,D)
-        
-
-        Omega_new = alpha*Omega_new
-        W_tilde = 1/alpha* W_tilde
+%         
+%         W_tilde = A.*D
+%         W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0)     % Compute W tilde
+%         
+%         Omega_new = EffectiveResistance(W_tilde)              % Update the shortest path weight matrix
+%         
+%         alpha = alpha_l1_global2(Omega_new,D)
+%         
+% 
+%         Omega_new = alpha*Omega_new
+%         W_tilde = 1/alpha* W_tilde
         
 
         diff_change = sum(sum((abs(D - Omega_new))./(D+(D==0))))/(N*(N-1));
@@ -118,13 +118,13 @@ function [output_Atilde,output_Omega] = IERP_2(D)
     output_Omega = alpha*output_Omega
     
 
-    % output_Atilde = ISPP_tree(output_Omega);
+%     output_Atilde2 = ISPP_tree(output_Omega);
     % output_Atilde(output_Atilde ~= 0) = 1 ./ output_Atilde(output_Atilde ~= 0);
     % output_Atilde
     output_Atilde = W;
     % output_Atilde2(output_Atilde2 ~= 0) = 1 ./ output_Atilde2(output_Atilde2 ~= 0);
     output_Atilde = alpha*output_Atilde
-    % diff = find(abs(output_Atilde2-output_Atilde)>0.00001)
+%     diff = find(abs(output_Atilde2-output_Atilde)>0.00001)
 end
 
 
@@ -140,7 +140,16 @@ function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_
     [output_Atilde,output_Omega] = IERP(D);
     t3 = toc;
     tic
-    [output_Atilde2,output_Omega2] = IERP_2(D);
+    [output_Atilde3,output_Omega3] = IERP_test(D);
+   
+
+    [output_Atilde2,output_Omega2] = IERP(D);
+    output_Omega2
+    EffectiveResistance(output_Atilde3)
+    EffectiveResistance(output_Atilde2)
+
+
+    
     t4 = toc;
     data3diff = find(abs(output_Atilde2-output_Atilde)>0.00001);
     data4diff = find(abs(output_Omega2-output_Omega)>0.00001);
@@ -156,6 +165,7 @@ function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_
     % 4. The norm of common links between two graphs
     Norm_output = sum(sum((abs(D - output_Omega))./(D+(D==0))))/(N*(N-1))
     Norm_output_2 = sum(sum((abs(D - output_Omega2))./(D+(D==0))))/(N*(N-1))
+    Norm_output_3 = sum(sum((abs(D - output_Omega3))./(D+(D==0))))/(N*(N-1))
 end
 
 
@@ -201,6 +211,51 @@ function alpha = alpha_l1_global3(A, D)
     r = D(A>0)./A(A>0);
     
     alpha = mean(r);
+end
+
+function [output_Atilde,output_Omega] = IERP_test(D)
+    N = size(D,1);
+    Input_Omega = D;
+    W_tilde  = Input_Omega;
+    W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);
+    Omega_new = EffectiveResistance(W_tilde);            % Compute the effective resistance Omega
+    diff_change = sum(sum((abs(D - Omega_new))./(D+(D==0))))/(N*(N-1));
+
+    % val = 1;
+    flag = 1;
+    A = (W_tilde > 0);
+    % Gnow = graph(W_tilde,"upper");
+    while(flag==1)                     % Remove links one by one until we exceed the constraints                            
+        previous_change = diff_change;
+        % method 1 R = A.*((Omega_new+eye(N)).^-1 - W_tilde)*(D-Omega_new) 
+        R = A.*((Omega_new+eye(N)).^-1 - W_tilde).*(D-Omega_new);     % Compute R
+        [val,~] = max(max(R));                              % Identify the maximum element
+        [row,col] = find(R == val);                        % Identify the link
+        A(row(1),col(1)) = 0; A(col(1),row(1)) = 0;        % Remove the link
+        W_tilde = A.*D;
+        W_tilde(W_tilde ~= 0) = 1 ./ W_tilde(W_tilde ~= 0);      % Compute W tilde
+        % Gnow = graph(W_tilde,"upper");
+        Omega_new = EffectiveResistance(W_tilde);               % Update the shortest path weight matrix
+        
+        diff_change = sum(sum((abs(D - Omega_new))./(D+(D==0))))/(N*(N-1));
+
+        if abs(diff_change) > abs(previous_change)
+            flag=0;
+        end    
+    end
+    
+    if(row(1) ~= col(1))
+        A(row(1),col(1)) = 1; A(col(1),row(1)) = 1;         % Return lastly removed link
+        W = A.*D;
+    %     W = 2*1/sum(sum(A.*D)).*A.*D;                       % Update the weighted adjacency matrix
+    end
+    W(W ~= 0) = 1 ./ W(W ~= 0);
+    output_Atilde = W;
+  
+    output_Omega = EffectiveResistance(output_Atilde);
+    alpha = alpha_l1_global_para(output_Omega,D);
+    output_Omega = alpha*output_Omega;
+    output_Atilde = 1/alpha*output_Atilde;
 end
 
 

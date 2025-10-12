@@ -48,9 +48,11 @@ function [output_Atilde,output_Omega] = IERP(D)
         W = A.*D;
     %     W = 2*1/sum(sum(A.*D)).*A.*D;                       % Update the weighted adjacency matrix
     end
+    W(W ~= 0) = 1 ./ W(W ~= 0);
     output_Atilde = W;
-    output_Omega = EffectiveResitance_withinverseA(W);
+  
+    output_Omega = EffectiveResistance(output_Atilde);
     alpha = alpha_l1_global_para(output_Omega,D);
     output_Omega = alpha*output_Omega;
-    output_Atilde = alpha*output_Atilde;
+    output_Atilde = 1/alpha*output_Atilde;
 end
