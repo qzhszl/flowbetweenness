@@ -1,17 +1,19 @@
 clear,clc
-old_flag = 1;
-N_vec = [20, 50, 100, 200];
+
 N_vec = [20,50,100,200];
+% N_vec = [20,50]
 p_start_vec = zeros(length(N_vec),1);
 countN = 1;
 
 for N = N_vec
-    p_start_vec(countN) = round(log(N)/N,4);
+    x = log(N)/N;
+    y = ceil(x * 1e4) / 1e4;  % round 4 decimal
+    p_start_vec(countN) = y;
     countN = countN+1;
 end
 
 data_mean = zeros(length(N_vec),1);
-data_std = zeros(length(N_vec),2);
+data_std = zeros(length(N_vec),1);
 countN = 1;
 
 for N = N_vec
@@ -29,7 +31,13 @@ for N = N_vec
     % 合并
     p_vec = [p_vec(1), extra_points, p_vec(2:end)];
     p_vec = round(p_vec,4);
-    p_vec =p_vec(1:6)
+    if N ==100
+        p_vec = [p_vec(1), 0.0500, p_vec(2:end)];
+    elseif N ==200
+        p_vec = [p_vec(1), 0.0300, p_vec(2:end)];
+    end
+    p_vec
+    % p_vec =p_vec(1:6)
 
     countp = 1;
     for p= p_vec
@@ -52,6 +60,7 @@ colors = ["#D08082", "#C89FBF", "#62ABC7", "#7A7DB1", "#6FB494", "#D9B382"];
 
 
 for countplot = 1:length(N_vec)
+    N = N_vec(countplot);
     % p_vec = linspace(p_start_vec(countplot), 1, 15);
     % p_vec = round(p_vec,4);
 
@@ -67,8 +76,17 @@ for countplot = 1:length(N_vec)
     % 合并
     p_vec = [p_vec(1), extra_points, p_vec(2:end)];
     p_vec = round(p_vec,4);
-
-    errorbar(p_vec(1:6), data_mean(:,countplot), data_std(:,countplot), 'o-', 'Color', colors(countplot), 'LineWidth', 4, 'MarkerSize', 10,'CapSize',8);
+    if N ==100
+        p_vec = [p_vec(1), 0.0500, p_vec(2:end)];
+    elseif N ==200
+        p_vec = [p_vec(1), 0.0300, p_vec(2:end)];
+    end
+    % if N<100
+    %     p_vec = p_vec
+    % end
+    y_plot = data_mean(:,countplot);
+    std_plot = data_std(:,countplot);
+    errorbar(p_vec, y_plot(1:length(p_vec)), std_plot(1:length(p_vec)), 'o-', 'Color', colors(countplot), 'LineWidth', 4, 'MarkerSize', 10,'CapSize',8);
 end
 
 
@@ -89,4 +107,4 @@ box on
 hold off
 
 picname = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_ER_norm.pdf");
-% exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
+exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);

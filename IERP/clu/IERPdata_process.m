@@ -23,11 +23,12 @@ for N = [100,200]
 
 end
 
-function process_data(N,p)
+function process_data(N, p)
     folder = 'D:\data\flow betweenness\IERP\';
     
     % 存储合并数据
     mergedData = [];
+    found_any = false;  % 标记是否找到至少一个文件
     
     % 遍历 1~20 的 inputpara
     for inputpara = 1:20
@@ -38,23 +39,25 @@ function process_data(N,p)
         if isfile(filename)
             % 读取数据
             data = readmatrix(filename);
-    
             % 合并
             mergedData = [mergedData; data];
-    
             % 删除原文件
             delete(filename);
             fprintf('已合并并删除: %s\n', filename);
+            found_any = true;
         else
             fprintf('未找到文件: %s\n', filename);
         end
     end
     
-    % 保存合并结果
-    outputFile = sprintf('%sIERP_N%dERp%.4f_weight_exp.txt', folder, N, p);
-    writematrix(mergedData, outputFile, 'Delimiter', ',');
-    
-    % fprintf('所有文件已合并并保存至: %s\n', outputFile);
+    % ⚠️ 仅当找到文件时才保存
+    if found_any
+        outputFile = sprintf('%sIERP_N%dERp%.4f_weight_exp.txt', folder, N, p);
+        writematrix(mergedData, outputFile, 'Delimiter', ',');
+        fprintf('✅ 已保存合并结果至: %s\n', outputFile);
+    else
+        fprintf('⚠️ N=%d, p=%.4f 未找到任何文件，不生成新文件。\n', N, p);
+    end
 end
 
 

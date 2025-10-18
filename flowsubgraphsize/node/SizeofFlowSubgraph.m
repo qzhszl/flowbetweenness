@@ -2,14 +2,16 @@ clear,clc
 % this.m inverstigate the size of the flow subgraph(nodes) in ER graph
 % We need 
 
-N = 100;
+N = 10;
 pc= log(N)/N;
-ave_degree = 0.2:0.2:4.9;
-ave_degree_2 = 5:10;
+% ave_degree = 0.2:0.2:4.9;
+% ave_degree_2 = 5:10;
 
 % ave_degree = 1.2:0.2:4;
 % ave_degree_2 = 5:10;
-ave_degree = [ave_degree,ave_degree_2];
+% ave_degree = [ave_degree,ave_degree_2];
+
+ave_degree = [7,8,9]
 p_list = ave_degree/(N-1);
    
 
@@ -129,7 +131,8 @@ end
 
 % figure
 figure()
-plot(ave_degree,avesize_fsg_list/N)
+flow_subgraph_linksize_list./Linknumlist
+plot(ave_degree,flow_subgraph_linksize_list./Linknumlist)
 hold on
 % plot(ave_degree,lcc_diffp/N)
 % hold on

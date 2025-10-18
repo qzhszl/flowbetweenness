@@ -1,12 +1,19 @@
 clear,clc
 N_vec = [20, 50, 100, 200];
-N_vec = [20,50];
+% N_vec = [20,50];
 p_start_vec = zeros(length(N_vec),1);
 countN = 1; 
+% for N = N_vec
+%     p_start_vec(countN) = round(log(N)/N,4);
+%     countN = countN+1;
+% end
 for N = N_vec
-    p_start_vec(countN) = round(log(N)/N,4);
+    x = log(N)/N;
+    y = ceil(x * 1e4) / 1e4;  % round 4 decimal
+    p_start_vec(countN) = y;
     countN = countN+1;
 end
+
 
 data_mean = zeros(length(N_vec),1);
 data_std = zeros(length(N_vec),2);

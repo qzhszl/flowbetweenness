@@ -30,7 +30,7 @@ ylabel('$E[\Lambda_l]$','interpreter','latex','FontSize',50);
 ax = gca;  % Get current axis
 ax.FontSize = 30;  % Set font size for tick label
 % xlim([0.01 0.55])
-ylim([5e-9 1])
+ylim([1e-9 1])
 % xticks([1 2 3 4])
 % xticklabels({'10','20','50','100'})
 
