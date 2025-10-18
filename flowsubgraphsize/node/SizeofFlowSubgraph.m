@@ -2,7 +2,7 @@ clear,clc
 % this.m inverstigate the size of the flow subgraph(nodes) in ER graph
 % We need 
 
-N = 10;
+N = 20;
 pc= log(N)/N;
 % ave_degree = 0.2:0.2:4.9;
 % ave_degree_2 = 5:10;
@@ -11,13 +11,14 @@ pc= log(N)/N;
 % ave_degree_2 = 5:10;
 % ave_degree = [ave_degree,ave_degree_2];
 
-ave_degree = [7,8,9]
+ave_degree = [19]
 p_list = ave_degree/(N-1);
    
 
 % nodep_list =zeros(length(p_list),1);
 avesize_fsg_list =zeros(length(p_list),1);
 stdsize_fsg_list =zeros(length(p_list),1);
+avelinksize_fsg_ratio_list=zeros(length(p_list),1);
 % lcc_diffp = zeros(length(p_list),1);
 % slcc_diffp = zeros(length(p_list),1);
 % p_ave = zeros(length(p_list),1);
@@ -39,13 +40,15 @@ for p=p_list(1:length(p_list))
     flow_subgraph_size_list = zeros(siumtimes,1);
     flow_subgraph_linksize_list = zeros(siumtimes,1);
     real_ave_degree_list = zeros(siumtimes,1);
+
     for i = 1:siumtimes
         if mod(i,100)==0
             disp(i/100)
         end     
-        A = rand(N,N) < p;
-        A = triu(A,1);
-        A = A + A';
+%         A = rand(N,N) < p;
+%         A = triu(A,1);
+%         A = A + A';
+        A = GenerateERfast(N,p,0);
      
    
         real_ave_degree = mean(sum(A));
@@ -53,8 +56,9 @@ for p=p_list(1:length(p_list))
         
         G = graph(A);
 
-    %     plot(G,'NodeColor',[0.8500 0.3250 0.0980], ...
-    % 'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
+        h = plot(G,'NodeColor',[0.8500 0.3250 0.0980], ...
+    'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
+        hold on
 
         Linknumlist(i) = numedges(G);
         % [max_size, second_max_size] = getLargestComponentsSize(G);
@@ -65,8 +69,14 @@ for p=p_list(1:length(p_list))
         while nodej == nodei
             nodej = randi(N);
         end
+
         [flowsubgraphlink,lsg] = flowsubgraph(G,nodei,nodej);
+
+%         [flowsubgraphlink, lsg] = compute_edge_currents(A, nodei, nodej)
         
+        visualize_current_flow(A, nodei, nodej)
+
+
         flow_subgraph_linksize_list(i) = lsg;
         
         if lsg ~= 0
@@ -112,6 +122,9 @@ for p=p_list(1:length(p_list))
     filename_real_linknum = sprintf("%dnode\\linknum_p%.5f.txt",N,p);
     filename_real_linknum = fullfile(filefolder_name, filename_real_linknum);
     writematrix(Linknumlist,filename_real_linknum)
+
+
+    avelinksize_fsg_ratio_list(count) = mean(flow_subgraph_linksize_list./Linknumlist);
         
 %     AnalysisSolution(count) = SolutionAnalytic(N,p);
 
@@ -131,15 +144,123 @@ end
 
 % figure
 figure()
-flow_subgraph_linksize_list./Linknumlist
-plot(ave_degree,flow_subgraph_linksize_list./Linknumlist)
+plot(ave_degree,avelinksize_fsg_ratio_list)
 hold on
+
+
+
 % plot(ave_degree,lcc_diffp/N)
 % hold on
 % plot(ave_degree,slcc_diffp/N)
 % hold on
+function visualize_current_flow(A, i, j)
+% 从节点 i 输入 1A，节点 j 输出 1A，绘制含电流的边（红色高亮）
+%
+% 输入:
+%   A - 邻接矩阵（权重表示导纳，A_ij>0 表示有边）
+%   i, j - 源节点与汇节点编号 (1-based)
+%
+% 输出:
+%   绘制网络图并高亮显示存在电流的边
+
+    n = size(A,1);
+
+    % ---- 1. 构造图拉普拉斯矩阵 ----
+    L = diag(sum(A,2)) - A;
+
+    % ---- 2. 电流注入向量 ----
+    b = zeros(n,1);
+    b(i) = 1; 
+    b(j) = -1;
+
+    % ---- 3. 去掉参考节点 ----
+    ref = n;
+    L_red = L(1:end-1, 1:end-1);
+    b_red = b(1:end-1);
+
+    % ---- 4. 求节点电位 ----
+    v = zeros(n,1);
+    v(1:end-1) = L_red \ b_red;  % v(ref)=0
+
+    % ---- 5. 计算边电流 ----
+    I_edges = A .* (v - v');
+
+    % ---- 6. 找出存在电流的边（无向边计一次）----
+    tol = 1e-12;
+    mask = (A > 0) & (abs(I_edges) > tol);
+
+    % ---- 7. 建立图对象并绘图 ----
+    G = graph(A);
+
+    figure;
+    h = plot(G, ...
+        'Layout', 'force', ...         % 使用力导向布局
+        'NodeColor', 'k', ...
+        'MarkerSize', 6, ...
+        'EdgeColor', [0.7 0.7 0.7]);  % 默认灰色
+
+    hold on;
+
+    % ---- 8. 高亮有电流的边 ----
+    [rows, cols] = find(triu(mask));  % 只取上三角避免重复
+    highlight(h, rows, cols, 'EdgeColor', 'r', 'LineWidth', 2);
+
+    % ---- 9. 高亮源节点和汇节点 ----
+    highlight(h, i, 'NodeColor', 'g', 'MarkerSize', 8);  % 输入点：绿色
+    highlight(h, j, 'NodeColor', 'm', 'MarkerSize', 8);  % 输出点：紫色
+
+    title(sprintf('Current flow from node %d → node %d', i, j), 'FontSize', 12);
+    hold off;
+end
+
+
+
+function [edge_currents, num_active_edges] = compute_edge_currents(A, i, j)
+% 计算从节点 i 注入 1A 电流、节点 j 流出 1A 时的边电流
+% 并统计存在电流的边数
+%
+% 输入:
+%   A - 邻接矩阵 (n×n)，表示导纳 (1/电阻)，A_ij>0表示有边
+%   i, j - 源节点与汇节点编号 (1-based)
+%
+% 输出:
+%   edge_currents - 每条边上的电流矩阵（与 A 相同大小, 对称）
+%   num_active_edges - 电流不为 0 的边数量（无向边计一次）
+
+    n = size(A, 1);
+
+    % ---- 1. 图拉普拉斯矩阵 ----
+    L = diag(sum(A, 2)) - A;
+
+    % ---- 2. 电流注入向量 ----
+    b = zeros(n, 1);
+    b(i) = 1;
+    b(j) = -1;
+
+    % ---- 3. 去掉一个参考节点（防止奇异） ----
+    ref = n;
+    L_red = L(1:end-1, 1:end-1);
+    b_red = b(1:end-1);
+
+    % ---- 4. 求解节点电位 ----
+    v = zeros(n, 1);
+    v(1:end-1) = L_red \ b_red;   % v(ref)=0
+
+    % ---- 5. 欧姆定律求电流 ----
+    edge_currents = A .* (v - v');  % I_ij = A_ij*(v_i - v_j)
+
+    % ---- 6. 统计存在电流的边数（无向边计一次）----
+    abs_currents = abs(edge_currents);
+    tol = 1e-12;  % 数值容差，小于此视为0
+    mask = (A > 0) & (abs_currents > tol);
+    
+    % 只统计上三角部分（避免重复）
+    num_active_edges = nnz(triu(mask));
+
+end
 
  
+
 
 
 function [max_size, second_max_size] = getLargestComponentsSize(G)
