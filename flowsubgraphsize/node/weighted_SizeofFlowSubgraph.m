@@ -2,16 +2,16 @@ clear,clc
 % this.m inverstigate the size of the flow subgraph(nodes) in ER graph
 % We need 
 
-N = 50;
+N = 10;
 pc= log(N)/N;
-ave_degree = 0.2:0.2:N-1;
+% ave_degree = 0.2:0.2:4.9;
 % ave_degree_2 = 5:10;
 
-% ave_degree = 1.2:0.2:4;
-% ave_degree_2 = 5:10;
-% ave_degree = [ave_degree,ave_degree_2];
+ave_degree = 0.2:0.2:5;
+ave_degree_2 = 5:10;
+ave_degree = [ave_degree,ave_degree_2];
 
-ave_degree = [40]
+% ave_degree = [19]
 p_list = ave_degree/(N-1);
    
 
@@ -26,7 +26,7 @@ avelinksize_fsg_ratio_list=zeros(length(p_list),1);
 
 count=0;
 siumtimes = 1000;
-filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new";
+filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new\\weighted";
 
 
 for p=p_list(1:length(p_list))
@@ -48,10 +48,10 @@ for p=p_list(1:length(p_list))
 %         A = rand(N,N) < p;
 %         A = triu(A,1);
 %         A = A + A';
-        A = GenerateERfast(N,p,0);
+        A = GenerateERfast(N,p,1);
      
-   
-        real_ave_degree = mean(sum(A));
+        adj = double(A ~= 0);
+        real_ave_degree = mean(sum(adj));
         real_ave_degree_list(i) = real_ave_degree;
         
         G = graph(A);
@@ -74,7 +74,7 @@ for p=p_list(1:length(p_list))
 
 %         [flowsubgraphlink, lsg] = compute_edge_currents(A, nodei, nodej)
         
-        visualize_current_flow(A, nodei, nodej)
+        % visualize_current_flow(A, nodei, nodej)
 
         flow_subgraph_linksize_list(i) = lsg;
         
@@ -128,6 +128,7 @@ for p=p_list(1:length(p_list))
     result_link(nonzero_idx) = flow_subgraph_linksize_list(nonzero_idx) ./ Linknumlist(nonzero_idx);
 
     avelinksize_fsg_ratio_list(count) = mean(result_link);
+        
 %     AnalysisSolution(count) = SolutionAnalytic(N,p);
 
 end

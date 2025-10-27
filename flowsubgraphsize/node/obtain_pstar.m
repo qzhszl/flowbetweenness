@@ -12,7 +12,11 @@ function x = obtain_pstar(N, p)
     c = (N-1)*p;
     % 定义方程：f(x) = LHS - RHS
 %     f = @(x) x - (1 - (1 - p * x)^(k - 1) - x .* (1 - x) .* (k - 1) .* p .* (1 - p * x).^(k - 2));
+    
+    %  pgf = e^{-miu(1-z)}
     % f = @(x) x - (1-exp(-c*x));
+    
+    % more accurate value
     f = @(x) x - (1 - (1 - p * x)^(k - 1));
     % 初始区间 [eps, 1-eps] 避免边界不适
     x0 = 0;

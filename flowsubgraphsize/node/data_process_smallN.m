@@ -1,9 +1,15 @@
 clear,clc
 
 N = 100;
-ave_degree = 0.2:0.2:4.9;
-ave_degree_2 = 5:10;
-ave_degree = [ave_degree,ave_degree_2];
+
+% % for weighted case;
+% ave_degree = 0.2:0.2:5
+% ave_degree_2 = 5:9;
+% ave_degree = [ave_degree,ave_degree_2];
+% p_list = ave_degree/(N-1);
+
+% for unweighted case:
+ave_degree = 0.2:0.2:N-1;
 p_list = ave_degree/(N-1);
 
 % 假设已有 N, p_list, filefolder_name
@@ -18,7 +24,7 @@ file_types = { ...
 
 col_names = {'SizeFSG', 'RealAveDegree', 'LinkSizeFSG', 'LinkNum'};
 
-filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new";
+filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new\\";
 
 % 遍历 p_list
 for i = 1:length(p_list)
@@ -53,7 +59,7 @@ end
 
 
 % 保存结果表
-outname = fullfile(filefolder_name, sprintf('%dnode_results_summary.csv', N));
+outname = fullfile(filefolder_name, sprintf('unweighted\\%dnode_results_summary.csv', N));
 writetable(result, outname);
 
 

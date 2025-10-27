@@ -21,6 +21,18 @@ for N = [10,20,50,100,1000,10000]
     hold on
 end
 
+% for N = [10,20,50,100,1000,10000]
+%     avg = 0:0.1:10;
+%     s_vals = zeros(size(avg));
+%     for i = 1:length(avg)
+%         s_vals(i) = compute_s_from_ER_test(N, avg(i));
+%     end
+%     % s_vals = s_vals.^1.5
+%     plot(avg, s_vals, 'LineWidth', 4, Color=colors(count))
+%     count = count+1;
+%     hold on
+% end
+
 
 % data for 10
 N = 10;
@@ -196,3 +208,71 @@ exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
 % ave = mean(nodesize_data,2)
 % std = std(nodesize_data,0,2)
 % plot(ave_degree,ave)
+
+
+% function s = compute_s_from_ER_test(N, miu)
+% % compute_s_from_ER: 计算 ER 随机图中的 s = 1 - φ(1 - x) - x φ'(1 - x)
+% % Inputs:
+% %   N - 节点数
+% %   p - 连边概率
+% % Output:
+% %   s - 表达式值
+% 
+%     % 第一步：用 PGF 方程求 x = p*
+%     x = obtain_pstar_test(N, miu);
+%     if length(x)>1
+%         x = x(2);
+%     else
+%         x = x(1);
+%     end
+% 
+% 
+%     % 第二步：计算 φ(1 - x) 和 φ'(1 - x): accurate s
+%     k = N - 1;
+%     s1 = 1 - x;
+% 
+%     phi = (1 - p + p * s1)^k;
+%     phi_prime = k * p * (1 - p + p * s1)^(k - 1);
+% 
+%     % 第三步：代入表达式计算 s
+%     s = 1 - phi - x * phi_prime;
+% 
+% 
+%     % 第三步：计算 φ(1 - x) 和 φ'(1 - x): approximate s
+%     % s = 1 - exp(-miu*x)*(1+miu*x);
+% 
+%     % new
+%     s = x^2*s;
+% end
+
+
+% function x = obtain_pstar_test(N, miu)
+% % obtain_pstar: 
+% % We denote the probability that following one random link $l$, 
+% % a node in the flow subgraph is found in one of its end $l^+$ as $p^*$
+% % Inputs:
+% %   N - number of nodes
+% %   p - link connection probability of ER
+% % Output:
+% %   x - solution to the fixed-point equation
+% 
+%     k = N - 1;
+%     c = miu;
+%     % 定义方程：f(x) = LHS - RHS
+% %     f = @(x) x - (1 - (1 - p * x)^(k - 1) - x .* (1 - x) .* (k - 1) .* p .* (1 - p * x).^(k - 2));
+% 
+%     % more accurate value  pgf = e^{-miu(1-z)}
+%     % f = @(x) x - (1-exp(-c*x));
+% 
+%     % more accurate value
+%     f = @(x) x - (1 - (1 - p * x)^(k - 1));
+%     % 初始区间 [eps, 1-eps] 避免边界不适
+%     x0 = 0;
+%     x1 = 1.1;
+% 
+%     % 数值求解
+%     x = find_all_roots(f, x0, x1);
+%     if isempty(x)
+%         x=0;
+%     end
+% end
