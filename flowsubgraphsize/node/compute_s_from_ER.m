@@ -13,16 +13,23 @@ function s = compute_s_from_ER(N, p)
     else
         x = x(1);
     end
-
-    % 第二步：计算 φ(1 - x) 和 φ'(1 - x)
+    
+    
+    % 第二步：计算 φ(1 - x) 和 φ'(1 - x): accurate s
     k = N - 1;
     s1 = 1 - x;
-    
+
     phi = (1 - p + p * s1)^k;
     phi_prime = k * p * (1 - p + p * s1)^(k - 1);
 
     % 第三步：代入表达式计算 s
     s = 1 - phi - x * phi_prime;
-    % try new
+    
+
+    % 第三步：计算 φ(1 - x) 和 φ'(1 - x): approximate s
+    % miu = N*p;
+    % s = 1 - exp(-miu*x)*(1+miu*x);
+
+    % new
     s = x^2*s;
 end
