@@ -10,14 +10,7 @@ N = 10;
 T = generate_a_tree(N,1,10);
 A = full(adjacency(T));
 
-A = GenerateERfast(N,0.5,0);
-subplot(2,2,1)
-
-G = graph(A);
-H = distances(G);
-plot(G,'EdgeLabel',G.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
-'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
-
+% A = GenerateERfast(N,0.5,0);
 
 A = [0	0	1	1	0	1	0	1	1	0
 0	0	1	0	0	0	1	1	0	1
@@ -29,8 +22,18 @@ A = [0	0	1	1	0	1	0	1	1	0
 1	1	0	1	1	0	1	0	0	0
 1	0	1	0	0	1	0	0	0	0
 0	1	1	1	0	0	1	0	0	0]
-% A sometimes is not invertable
 
+subplot(2,2,1)
+
+G = graph(A);
+H = distances(G);
+plot(G,'EdgeLabel',G.Edges.Weight,'NodeColor',[0.8500 0.3250 0.0980], ...
+'EdgeAlpha',0.5,'LineWidth',1,'MarkerSize',7,'EdgeLabelColor',[0 0.4470 0.7410],'NodeFontSize',10);
+
+
+
+% A sometimes is not invertable
+det(H)
 rank(H)
 
 
