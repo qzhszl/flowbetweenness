@@ -34,23 +34,23 @@ colors = ["#D08082","#6FB494","#D9B382","#7A7DB1","#62ABC7","#A0A0A0"];
 % end
 
 count = 1;
-for N = [100]
+for N = [10,20,30,50,80,100]
     filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new\\unweighted";
     outname = fullfile(filefolder_name, sprintf('%dnode_results_summary.csv', N));
     result_table = readtable(outname);
-    x = result_table.RealAveDegree;
+    x = result_table.p;
     y = result_table.LinkSizeFSG./result_table.LinkNum;
-    if N>=60
-        idx = 1:2:length(x);
-    else
-        idx = 1:3:length(x);
-    end
-    x = x(idx);
-    y = y(idx);
-    x = x(idx>400);
-    % x = log(x);
-    % x = log(x);
-    y = y(idx>400);
+    % if N>=60
+    %     idx = 1:2:length(x);
+    % else
+    %     idx = 1:3:length(x);
+    % end
+    % x = x(idx);
+    % y = y(idx);
+    % x = x(idx>400);
+    % % x = log(x);
+    % % x = log(x);
+    % y = y(idx>400);
     % y = log(y);
     % y = log(y);
     plot(x,y,'Marker', 'p','LineStyle','none', 'MarkerSize', 6,'MarkerEdgeColor',colors(count), 'MarkerFaceColor', colors(count))
@@ -65,13 +65,13 @@ ylabel('$\rho_L$','interpreter','latex',FontSize=16)
 % set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
 box on
 % set(gca, 'YScale', 'log')
-% lgd = legend({'Analytical value', 'Simulation result', ...
-%         '$N=10$', '$N=20$', '$N=30$', '$N=50$', '$N=80$', '$N=100$'}, ...
-%         'Interpreter', 'latex', ...
-%         'FontSize', 14, ...
-%         'Location', 'east', ...
-%         'Box', 'on');
-% lgd.ItemTokenSize = [12, 10];
+lgd = legend({'Analytical value', 'Simulation result', ...
+        '$N=10$', '$N=20$', '$N=30$', '$N=50$', '$N=80$', '$N=100$'}, ...
+        'Interpreter', 'latex', ...
+        'FontSize', 14, ...
+        'Location', 'east', ...
+        'Box', 'on');
+lgd.ItemTokenSize = [12, 10];
 % set(findobj(lgd, 'type', 'line'), 'LineWidth', 4);
 ax = gca;  % Get current axis
 ax.FontSize = 12;  % Set font size for tick label
