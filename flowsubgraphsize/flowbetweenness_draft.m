@@ -2,7 +2,7 @@ clear,clc
 % this.m inverstigate the size of the flow subgraph(nodes) in ER graph
 % We need 
 
-N = 10;
+N = 6;
 pc= log(N)/N;
 ave_degree = 0.2:0.2:N-1;
 % ave_degree_2 = 5:10;
@@ -11,19 +11,15 @@ ave_degree = 0.2:0.2:N-1;
 % ave_degree_2 = 5:10;
 % ave_degree = [ave_degree,ave_degree_2];
 
-ave_degree = [9]
+ave_degree = [5]
 p_list = ave_degree/(N-1);
 siumtimes = 1;
-xy = [-1.11011029095096	1.98939979426713
-1.71458321230126	1.29939617719004
--2.25474822489503	-0.466913860161719
-0.0999495132772466	-2.18629909387507
--1.51108038780023	0.690100907548043
-1.48144191358045	-1.54328595239148
-2.17701981164112	-0.168932479440598
-0.436398437594845	2.06531599356684
--1.25307268018339	-1.61591780451991
-0.219618695434688	-0.0628636821832742];
+xy = [0.802385749219495	1.59761712128446
+1.76031580715563	0.102069992210448
+0.984548013597186	-1.49701944025127
+-1.78749905874878	-0.106709857894361
+-0.787506726261186	-1.56875592122334
+-0.972243784962346	1.47279810587407];
 
 
 for p=p_list(1:length(p_list))
@@ -31,18 +27,14 @@ for p=p_list(1:length(p_list))
     nodep=0;
 
     for i = 1:siumtimes
-        A = GenerateERfast(N,p,0);
+%         A = GenerateERfast(N,p,0);
 
-        A  = [0	0	1	1	1	1	1	1	1	1
-            0	0	1	1	1	1	1	1	1	1
-            1	1	0	1	1	1	1	1	1	1
-            1	1	1	0	1	1	1	1	1	1
-            1	1	1	1	0	1	1	1	1	1
-            1	1	1	1	1	0	1	1	1	1
-            1	1	1	1	1	1	0	1	1	1
-            1	1	1	1	1	1	1	0	1	1
-            1	1	1	1	1	1	1	1	0	1
-            1	1	1	1	1	1	1	1	1	0];
+        A = [0	1	1	1	1	1
+            1	0	1	1	1	0
+            1	1	0	1	1	1
+            1	1	1	0	1	1
+            1	1	1	1	0	1
+            1	0	1	1	1	0];
 
         real_ave_degree = mean(sum(A));
         real_ave_degree_list(i) = real_ave_degree;
@@ -58,7 +50,7 @@ for p=p_list(1:length(p_list))
         % Lcc_list(i)  = max_size;
         % sLcc_list(i) = second_max_size;
         nodei = 1;
-        nodej = 6;
+        nodej = 5;
 
         [flowsubgraphlink,lsg] = flowsubgraph(G,nodei,nodej);
 
