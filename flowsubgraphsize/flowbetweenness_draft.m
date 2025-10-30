@@ -29,9 +29,9 @@ for p=p_list(1:length(p_list))
     for i = 1:siumtimes
 %         A = GenerateERfast(N,p,0);
 
-        A = [0	1	1	1	1	1
-            1	0	1	1	1	0
-            1	1	0	1	1	1
+        A = [0	0	0	1	1	1
+            0	0	1	1	1	0
+            0	1	0	1	1	1
             1	1	1	0	1	1
             1	1	1	1	0	1
             1	0	1	1	1	0];
@@ -54,6 +54,9 @@ for p=p_list(1:length(p_list))
 
         [flowsubgraphlink,lsg] = flowsubgraph(G,nodei,nodej);
 
+
+
+
 %         [flowsubgraphlink, lsg] = compute_edge_currents(A, nodei, nodej)
         
         flow_subgraph_linksize_list(i) = lsg
@@ -62,6 +65,8 @@ for p=p_list(1:length(p_list))
         h = findobj(gca,'Type','GraphPlot');
         xy = [h.XData' h.YData'];
 
+        [Ac, Gc, p] = complement_graph(A);
+        [L, GL, p, edgeTable] = line_graph_from_adj(A);
         
         
         if lsg ~= 0
@@ -78,6 +83,147 @@ for p=p_list(1:length(p_list))
                
     end
 end
+
+function [L, GL, p, edgeTable] = line_graph_from_adj(A, nodeNames)
+% LINE_GRAPH_FROM_ADJ  由邻接矩阵 A 构造线图的邻接矩阵 L，并绘图。
+% 假设 A 为无向简单图；函数会做合理化处理（同上）。
+%
+% 输入：
+%   A          (n×n) 邻接矩阵
+%   nodeNames  (可选) 1×n 的字符串/字符元胞数组——用于原图的结点命名，
+%                     线图结点将按“u-v”命名（对应原图的一条边）
+%
+% 输出：
+%   L         (m×m) 线图的邻接矩阵（逻辑），m 为原图边数
+%   GL        MATLAB graph 对象（线图）
+%   p         plot 句柄
+%   edgeTable 原图的边表（table），含 EndNodes，便于溯源
+
+    arguments
+        A {mustBeNumericOrLogical, mustBeSquare(A)}
+        nodeNames = []
+    end
+
+    n = size(A,1);
+
+    % —— 规范化 A —— %
+    A = double(A ~= 0);
+    A(1:n+1:end) = 0;
+    A = triu(A,1);
+    A = A + A.';
+
+    % 原图（用于拿边表）
+    if isempty(nodeNames)
+        G = graph(A);
+    else
+        G = graph(A, string(nodeNames));
+    end
+
+    edgeTable = G.Edges;     % table, 变量名通常为 EndNodes
+    m = numedges(G);
+    if m == 0
+        L  = false(0,0);
+        GL = graph();
+        warning('原图无边，线图为空。');
+        p = [];
+        return;
+    end
+
+    % —— 构造点-边关联矩阵 B —— %
+    % B(i,e) = 1 若结点 i 与边 e 关联
+    B = zeros(n, m);
+    ends = G.Edges.EndNodes;  % m×2，存储每条边的两个端点名（字符串）
+    % 将端点名映射回索引
+    if isempty(nodeNames)
+        % 节点默认编号为 1..n 的字符串
+        name2idx = containers.Map(string(1:n), 1:n);
+    else
+        names = string(G.Nodes.Name);
+        name2idx = containers.Map(names, 1:n);
+    end
+    for e = 1:m
+        u = name2idx(string(ends(e,1)));
+        v = name2idx(string(ends(e,2)));
+        B(u,e) = 1;
+        B(v,e) = 1;
+    end
+
+    % —— 线图邻接 —— %
+    Lw = B.' * B;            % 对角线上=2；非对角=共享端点的次数（0或1）
+    Lw = Lw - 2*eye(m);      % 去掉对角 2
+    L  = Lw > 0;             % 二值化
+    L  = logical(L);
+
+    % —— 线图结点命名（用“u-v”） —— %
+    ln = strings(m,1);
+    for e = 1:m
+        ln(e) = ends(e,1) + "-" + ends(e,2);
+    end
+
+    GL = graph(L, ln);
+
+    % —— 绘图 —— %
+    figure('Name','Line Graph');
+    p = plot(GL, 'Layout','force');
+    title('Line Graph');
+
+end
+
+
+
+
+
+function [Ac, Gc, p] = complement_graph(A, nodeNames)
+% COMPLEMENT_GRAPH  由邻接矩阵 A 生成补图的邻接矩阵 Ac，并绘图。
+% 假设 A 表示无向简单图（无自环、无多重边）。函数会做合理化处理：
+%   - 去掉对角元
+%   - 二值化
+%   - 对称化
+%
+% 输入：
+%   A          (n×n) 邻接矩阵（数值或逻辑）
+%   nodeNames  (可选) 1×n 的字符串/字符元胞数组，用作结点标签
+%
+% 输出：
+%   Ac  (n×n) 补图的邻接矩阵（逻辑）
+%   Gc  MATLAB graph 对象
+%   p   plot 句柄
+
+    arguments
+        A {mustBeNumericOrLogical, mustBeSquare(A)}
+        nodeNames = []
+    end
+
+    n = size(A,1);
+
+    % —— 规范化 A 为无向简单图 —— %
+    A = double(A ~= 0);
+    A(1:n+1:end) = 0;           % 去对角元（自环）
+    A = triu(A,1);              % 只保留上三角，去掉可能的多重与方向
+    A = A + A.';                % 对称化
+    
+    % —— 生成补图 —— %
+    Ac = ~A & ~eye(n);          % 非边且非自环
+    Ac = logical(Ac);
+
+    % —— 绘图 —— %
+    if isempty(nodeNames); Gc = graph(Ac);
+    else;                   Gc = graph(Ac, string(nodeNames));
+    end
+    figure('Name','Complement Graph');
+    p = plot(Gc, 'Layout','force');
+    title('Complement Graph');
+
+end
+
+function mustBeSquare(A)
+    if size(A,1) ~= size(A,2)
+        error('A 必须是方阵。');
+    end
+end
+
+
+
 
 function visualize_current_flow(A, i, j,lsg, xy)
 % visualize_current_flow(A, i, j, xy)
