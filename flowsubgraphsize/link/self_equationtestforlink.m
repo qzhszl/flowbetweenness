@@ -19,6 +19,7 @@ function x_solution = obtain_ex(N, p)
     % 3. 定义函数 f(x)
     % f(x) = x - EL + ((x/EL*p)^2+(1-x/EL*p)^2)^(N-2)*p;
     f = @(x) x - EL + (((x/EL*p).^2) + ((1 - x/EL*p).^2)).^(N-2)* nchoosek(N-2, 2)* p;
+    % f = @(x) ((1.2*x).^2 +(1-1.2*x).^2).^(N-2);
     
     % 4. 使用 fzero 求解
     % 选取一个初始猜测值，例如 EL
@@ -28,7 +29,7 @@ function x_solution = obtain_ex(N, p)
     figure;
     fplot(f, [0, EL]); % 绘制范围从 0 到 2*EL
     hold on;
-    plot(x_solution, 0, 'ro', 'MarkerSize', 8); % 标记找到的解
+    % plot(x_solution, 0, 'ro', 'MarkerSize', 8); % 标记找到的解
     yline(0, 'k--'); % 绘制 x 轴
     xlabel('x');
     ylabel('f(x)');

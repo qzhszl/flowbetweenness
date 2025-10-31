@@ -32,9 +32,9 @@ for p=p_list(1:length(p_list))
         A = [0	0	1	1	1	1
             0	0	1	1	1	1
             1	1	0	1	1	1
-            1	1	1	0	1	1
+            1	1	1	0	1	0
             1	1	1	1	0	1
-            1	1	1	1	1	0];
+            1	1	1	0	1	0];
 
         real_ave_degree = mean(sum(A));
         real_ave_degree_list(i) = real_ave_degree;
@@ -55,8 +55,6 @@ for p=p_list(1:length(p_list))
         [flowsubgraphlink,lsg] = flowsubgraph(G,nodei,nodej);
 
 
-
-
 %         [flowsubgraphlink, lsg] = compute_edge_currents(A, nodei, nodej)
         
         flow_subgraph_linksize_list(i) = lsg
@@ -65,10 +63,12 @@ for p=p_list(1:length(p_list))
         h = findobj(gca,'Type','GraphPlot');
         xy = [h.XData' h.YData'];
 
-        [Ac, Gc, p] = complement_graph(A);
-        [L, GL, p, edgeTable] = line_graph_from_adj(A);
+        % [Ac, Gc, p] = complement_graph(A);
+        % [L, GL, p, edgeTable] = line_graph_from_adj(A);
+        
+        Q = sum(A)-A
+        [V,D] = eigs(Q)
 
-        sym_groups = find_symmetric_nodes(A)
         
         
         if lsg ~= 0
