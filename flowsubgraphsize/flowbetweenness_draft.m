@@ -29,12 +29,12 @@ for p=p_list(1:length(p_list))
     for i = 1:siumtimes
 %         A = GenerateERfast(N,p,0);
 
-        A = [0	0	0	1	1	1
-            0	0	1	1	1	0
-            0	1	0	1	1	1
+        A = [0	0	1	1	1	1
+            0	0	1	1	1	1
+            1	1	0	1	1	1
             1	1	1	0	1	1
             1	1	1	1	0	1
-            1	0	1	1	1	0];
+            1	1	1	1	1	0];
 
         real_ave_degree = mean(sum(A));
         real_ave_degree_list(i) = real_ave_degree;
@@ -67,6 +67,8 @@ for p=p_list(1:length(p_list))
 
         [Ac, Gc, p] = complement_graph(A);
         [L, GL, p, edgeTable] = line_graph_from_adj(A);
+
+        sym_groups = find_symmetric_nodes(A)
         
         
         if lsg ~= 0
@@ -83,6 +85,33 @@ for p=p_list(1:length(p_list))
                
     end
 end
+
+
+function sym_groups = find_symmetric_nodes(A)
+% 返回所有在结构上对称的节点组
+% 输入：A - 无向邻接矩阵 (n×n)
+% 输出：sym_groups - 元胞数组，每个元素是一组对称节点
+
+    n = size(A,1);
+    A = A + A';        % 若是有向图，可注释此行
+    A(A>0) = 1;        % 无权化
+    
+    sym_groups = {};
+    visited = false(n,1);
+    
+    for i = 1:n
+        if visited(i), continue; end
+        % 找所有邻接向量完全相同的节点
+        same = all(A == A(i,:), 2);
+        idx = find(same);
+        if numel(idx) > 1
+            sym_groups{end+1} = idx; %#ok<AGROW>
+        end
+        visited(idx) = true;
+    end
+end
+
+
 
 function [L, GL, p, edgeTable] = line_graph_from_adj(A, nodeNames)
 % LINE_GRAPH_FROM_ADJ  由邻接矩阵 A 构造线图的邻接矩阵 L，并绘图。

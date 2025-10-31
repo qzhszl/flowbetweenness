@@ -34,7 +34,7 @@ colors = ["#D08082","#6FB494","#D9B382","#7A7DB1","#62ABC7","#A0A0A0"];
 % end
 
 count = 1;
-for N = [10,20,30,50,80,100]
+for N = [10,100]
     filefolder_name = "D:\\data\\flow betweenness\\sizeofflowsubgraph\\new\\unweighted";
     outname = fullfile(filefolder_name, sprintf('%dnode_results_summary.csv', N));
     result_table = readtable(outname);
@@ -57,6 +57,21 @@ for N = [10,20,30,50,80,100]
     hold on
     count = count+1;
 end
+
+N = 100
+p = linspace(0.5,1,100);
+coef = nchoosek(N-2, 2);          % 这是整数，安全
+q = (p.^2 + (1 - p).^2).^(N - 2);
+x = coef .* q;                    % x = sym_nodepair_num (可能是非整数的期望)
+
+allnodepair = nchoosek(N, 2);
+
+
+% --- 连续组合数：C(x,2) = x*(x-1)/2，且 C(N,2)=N*(N-1)/2 ---
+y = 1 - x  ./ allnodepair;
+plot(p,y)
+
+
 % ylim([0,1.05]);
 % xlim([0,160]);
 % lgd = legend({sprintf('simultion:$\\Lambda_l$, $N=%d$',n), s}, 'interpreter','latex','Location', 'best',FontSize=30);
@@ -65,12 +80,12 @@ ylabel('$\rho_L$','interpreter','latex',FontSize=16)
 % set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
 box on
 % set(gca, 'YScale', 'log')
-lgd = legend({'Analytical value', 'Simulation result', ...
-        '$N=10$', '$N=20$', '$N=30$', '$N=50$', '$N=80$', '$N=100$'}, ...
-        'Interpreter', 'latex', ...
-        'FontSize', 14, ...
-        'Location', 'east', ...
-        'Box', 'on');
+% lgd = legend({'Analytical value', 'Simulation result', ...
+%         '$N=10$', '$N=20$', '$N=30$', '$N=50$', '$N=80$', '$N=100$'}, ...
+%         'Interpreter', 'latex', ...
+%         'FontSize', 14, ...
+%         'Location', 'east', ...
+%         'Box', 'on');
 lgd.ItemTokenSize = [12, 10];
 % set(findobj(lgd, 'type', 'line'), 'LineWidth', 4);
 ax = gca;  % Get current axis
