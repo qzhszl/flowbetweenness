@@ -51,21 +51,23 @@ for N = [10,20,30,50,80,100]
 end
 ylim([0,1.05]);
 xlim([0,160]);
+
 % lgd = legend({sprintf('simultion:$\\Lambda_l$, $N=%d$',n), s}, 'interpreter','latex','Location', 'best',FontSize=30);
 xlabel('$E[D]$',Interpreter='latex',FontSize=16);
 ylabel('$\rho_L$','interpreter','latex',FontSize=16)
 % set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
 box on
 
-lgd = legend({'Analytical value', 'Simulation result', ...
+lgd = legend({'Ana.', 'Sim.', ...
         '$N=10$', '$N=20$', '$N=30$', '$N=50$', '$N=80$', '$N=100$'}, ...
         'Interpreter', 'latex', ...
+        'Position', [0.17 0.55 0.1 0.1],...
         'FontSize', 14, ...
-        'Location', 'east', ...
         'Box', 'on');
 lgd.ItemTokenSize = [12, 10];
 % set(findobj(lgd, 'type', 'line'), 'LineWidth', 4);
 ax = gca;  % Get current axis
 ax.FontSize = 12;  % Set font size for tick label
+set(gca,"xscale","log")
 picname = sprintf("D:\\data\\flow betweenness\\sizeofflowsubgraph\\new\\linksize_flow_subgraph_unweighted.pdf");
 exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);
