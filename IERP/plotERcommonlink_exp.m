@@ -1,19 +1,11 @@
 clear,clc
 N_vec = [20, 50, 100, 200];
-% N_vec = [20,50];
 p_start_vec = zeros(length(N_vec),1);
 countN = 1; 
-% for N = N_vec
-%     p_start_vec(countN) = round(log(N)/N,4);
-%     countN = countN+1;
-% end
 for N = N_vec
-    x = log(N)/N;
-    y = ceil(x * 1e4) / 1e4;  % round 4 decimal
-    p_start_vec(countN) = y;
+    p_start_vec(countN) = round(log(N)/N,4);
     countN = countN+1;
 end
-
 
 data_mean = zeros(length(N_vec),1);
 data_std = zeros(length(N_vec),2);
@@ -26,7 +18,7 @@ for N = N_vec
     for p= p_vec
         filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_weight_exp.txt",N,p);
         results = readmatrix(filename);
-        results = results(:,4);
+        results = results(:,3);
         mean_values = mean(results);
         std_values = std(results);
         data_mean(countp,countN) = mean_values;
@@ -53,17 +45,16 @@ end
 ax = gca;  % Get current axis
 ax.FontSize = 30;  % Set font size for tick label
 xlim([0 1.02])
-% ylim([0.05 0.3])
+% ylim([0.05 0.25])
 % xticks([1 2 3 4])
 % xticklabels({'10','20','50','100'})
 xlabel('$p$',Interpreter='latex',FontSize=40);
-% ylabel('$\frac{1}{N(N-1)}\sum_i\sum_j\frac{|d_{ij}-\omega_{ij}|}{d_{ij}}$','interpreter','latex',FontSize=40)
-ylabel('$\|D-\Omega\|$','interpreter','latex',FontSize=40)
-% lgd = legend({'$N = 20$', '$N = 50$', '$N = 100$', '$N = 200$'}, 'interpreter','latex','Location', 'northwest',FontSize=30);
+ylabel('$L_c/L_H$','interpreter','latex',FontSize=40)
+% lgd = legend({'$N = 20$', '$N = 50$', '$N = 100$', '$N = 200$'}, 'interpreter','latex','Location', 'southeast',FontSize=30);
 % lgd.NumColumns = 2;
 % set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
 box on
 hold off
 
-picname = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_ER_norm_exp.pdf");
+picname = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_ER_commonlink_exp.pdf");
 exportgraphics(fig, picname,'BackgroundColor', 'none','Resolution', 600);

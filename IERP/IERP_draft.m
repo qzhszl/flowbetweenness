@@ -13,7 +13,7 @@ clear,clc
 % 6. update the \Omega
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
-N = 10
+N = 1000
 p_start_vec = zeros(4,1);
 count = 1; 
 p = 0.3
@@ -46,7 +46,11 @@ end
 
 % 2. run simulations
 A_input(A_input ~= 0) = 1 ./ A_input(A_input ~= 0);
-[L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_ER(A_input);
+% [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_ER(A_input);
+
+Omega = EffectiveResistance(A_input);
+A = ISPP_tree(Omega);
+find(abs(A - A_input)>0.000001)
 
 
 
