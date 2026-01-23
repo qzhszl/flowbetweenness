@@ -54,7 +54,7 @@ xlim([0,160]);
 
 % lgd = legend({sprintf('simultion:$\\Lambda_l$, $N=%d$',n), s}, 'interpreter','latex','Location', 'best',FontSize=30);
 xlabel('$E[D]$',Interpreter='latex',FontSize=16);
-ylabel('$\rho_L$','interpreter','latex',FontSize=16)
+ylabel('$E\left[\rho_L \right]$','interpreter','latex',FontSize=16)
 % set(legend, 'Position', [0.446, 0.73, 0.2, 0.1]);
 box on
 
