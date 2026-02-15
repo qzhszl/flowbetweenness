@@ -13,18 +13,19 @@ clear, clc
 % 7. repeat 2-6 until Diff between Omega and the given demand is minimum: Return lastly removed link
 
 N_vec = [10, 20, 50, 100];
-N_vec = [10]
-simutimes = 1
+N_vec = [120,140,160,180,200]
+simutimes = 1000
 for N = N_vec
     result = zeros(simutimes,4);
     for simu_time = 1:simutimes
+        current = [N,simu_time]
         % 1. generate a graph
         % _________________________________________________________________________
         % (a) tree:
         T = generate_a_tree(N,1,10);
         A_input = full(adjacency(T,"weighted"));
         % 2. run simulations
-        [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_tree(A_input)
+        [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_tree(A_input);
         result(simu_time,:) = [L_add_output,L_ouput,L_comm_output,Norm_output];
     end
     filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dtree.txt",N);

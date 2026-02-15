@@ -18,20 +18,34 @@ h_star = plot(nan, nan, 'kp', 'MarkerSize', 6, 'LineStyle', 'none','MarkerFaceCo
 colors = ["#D08082","#6FB494","#D9B382","#7A7DB1","#62ABC7","#A0A0A0"];
 % colors = ["#C89FBF","#62ABC7","#B3C47A","#E2C572",];
 
+% count = 1;
+% for N = [10,20,30,50,80,100]
+%     avg = 0:0.2:8;
+%     avg = [avg,N-1];
+%     p_vals = avg/(N-1);
+% 
+%     s_vals = zeros(size(p_vals));
+%     for i = 1:length(p_vals)
+%         s_vals(i) = compute_S_link_from_ER(N, p_vals(i));
+%     end
+%     plot(avg, s_vals, 'LineWidth', 2, Color=colors(count))
+%     count = count+1;
+%     hold on
+% end
+
+
 count = 1;
 for N = [10,20,30,50,80,100]
-    avg = 0:0.2:8;
-    avg = [avg,N-1];
+    avg = 0:0.2:N-1;
     p_vals = avg/(N-1);
-    
-    s_vals = zeros(size(p_vals));
-    for i = 1:length(p_vals)
-        s_vals(i) = compute_S_link_from_ER(N, p_vals(i));
-    end
+
+    s_vals = 1 - (p_vals.^2 + (1-p_vals).^2).^(N-2);
     plot(avg, s_vals, 'LineWidth', 2, Color=colors(count))
     count = count+1;
     hold on
 end
+
+
 
 count = 1;
 for N = [10,20,30,50,80,100]
