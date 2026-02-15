@@ -52,7 +52,7 @@ for p_star = [0,0.797,0.993]
 end
 
 
-leg_text = ["$y=x$", "$E[D]=0.5$", "$E[D]=1$", "$E[D]=2$", "$E[D]=5$"];
+leg_text = ["$y=p$", "$E[D]=0.5$", "$E[D]=1$", "$E[D]=2$", "$E[D]=5$"];
 lgd =legend([h1 h_curves], leg_text, ...
        'Interpreter','latex', 'FontSize',14, ...
        'Box','on');
