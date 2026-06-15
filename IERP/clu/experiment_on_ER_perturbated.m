@@ -1,4 +1,4 @@
-function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_ER_perturbated(A_input,noise_amplitude)
+function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output,L_add_output2,L_ouput2,L_comm_output_ratio2,Norm_output2] = experiment_on_ER_perturbated(A_input,noise_amplitude)
     % % ensure the input link weight change from 0,1
     % Input_Omega = EffectiveResitance_withinverseA(A_input);
 
@@ -18,12 +18,13 @@ function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_
 
     % Generate perturbed demand matrix
     D = D .* (1 + noise_amplitude * Z);
-    
+    D(D < 0) = Input_Omega(D < 0);
+
     % tic
     [output_Atilde,output_Omega] = IERP(D);
     % t3 = toc
     % tic
-    % [output_Atilde2,output_Omega2] = IERP_speedtest(D);
+    [output_Atilde2,output_Omega2] = GL_leastsquares(D);
     % t4 = toc
     % data3diff = find(abs(output_Atilde2-output_Atilde)>0.00001)
     % data4diff = find(abs(output_Omega2-output_Omega)>0.00001)
@@ -38,5 +39,15 @@ function [L_add_output,L_ouput,L_comm_output_ratio,Norm_output] = experiment_on_
     L_comm_output_ratio = nnz(A_input.*output_Atilde)/nnz(output_Atilde); 
     % 4. The norm of common links between two graphs
     Norm_output = sum(sum((abs(D - output_Omega))./(D+(D==0))))/(N*(N-1));
+    
+    
+    % Store the results FOR the benchmark
+    L_add_output2 = 0.5*(nnz(output_Atilde2)-nnz(A_input));
+    % 2. The number of links in the obtained graph
+    L_ouput2 = 0.5*nnz(output_Atilde2);  
+    % 3. The number of common links between two graphs
+    L_comm_output_ratio2 = nnz(A_input.*output_Atilde2)/nnz(output_Atilde2); 
+    % 4. The norm of common links between two graphs
+    Norm_output2 = sum(sum((abs(D - output_Omega2))./(D+(D==0))))/(N*(N-1));
 end
 

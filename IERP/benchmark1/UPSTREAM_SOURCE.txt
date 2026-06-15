@@ -1,0 +1,12 @@
+Upstream project:
+https://github.com/cnmusco/graph-similarity-learning
+
+Archive:
+https://github.com/cnmusco/graph-similarity-learning/archive/refs/heads/master.zip
+
+Retrieved:
+2026-06-12
+
+The directory upstream_graph_similarity_learning is an unchanged copy of
+the downloaded author repository. GL_leastsquares.m and the regression
+test are separate adapter files and do not modify the upstream source.

@@ -18,23 +18,24 @@ x = log(N)/N;
 y = ceil(x * 1e4) / 1e4;  % round 4 decimal
 p_start = y;
     
-simutimes = 50;
+simutimes = 100;
 
-result = zeros(simutimes,4);
-p_vec = linspace(p_start, 1, 15);
-% 前两个点
-p1 = p_vec(1);
-p2 = p_vec(2);  
-% 在 p1 和 p2 之间插入两个点
-extra_points = linspace(p1, p2, 4);  % 生成4个点
-extra_points = extra_points(2:3);    % 去掉第一个和最后一个（原本已有）
-% 合并
-p_vec = [p_vec(1), extra_points, p_vec(2:end)];
-p_vec = round(p_vec,4);
+result = zeros(simutimes,8);
+% p_vec = linspace(p_start, 1, 15);
+% % 前两个点
+% p1 = p_vec(1);
+% p2 = p_vec(2);  
+% % 在 p1 和 p2 之间插入两个点
+% extra_points = linspace(p1, p2, 4);  % 生成4个点
+% extra_points = extra_points(2:3);    % 去掉第一个和最后一个（原本已有）
+% % 合并
+% p_vec = [p_vec(1), extra_points, p_vec(2:end)];
+% p_vec = round(p_vec,4);
 
+p_vec = [0.4];
 for p= p_vec
     for simu_time = 1:simutimes
-        current_output_s = sprintf("N%d, p%.4f: %d/%d",N,p,simu_time,simutimes);
+        current_output_s = sprintf("N%d, p%.4f,noise%.2f : %d/%d",N,p,noise_amplitude,simu_time,simutimes);
         disp(current_output_s)
         % 1. generate a graph
         % _________________________________________________________________________
@@ -50,11 +51,11 @@ for p= p_vec
 
         % 2. run simulations
         A_input(A_input ~= 0) = 1 ./ A_input(A_input ~= 0);
-        [L_add_output,L_ouput,L_comm_output,Norm_output] = experiment_on_ER_perturbated(A_input,noise_amplitude);
+        [L_add_output,L_ouput,L_comm_output,Norm_output,L_add_output2,L_ouput2,L_comm_output2,Norm_output2] = experiment_on_ER_perturbated(A_input,noise_amplitude);
         
-        result(simu_time,:) = [L_add_output,L_ouput,L_comm_output,Norm_output];
+        result(simu_time,:) = [L_add_output,L_ouput,L_comm_output,Norm_output,L_add_output2,L_ouput2,L_comm_output2,Norm_output2];
     end
-    filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%_noise%.2f_simu%d.4f.txt",N,p,inputpara);
+    filename = sprintf("D:\\data\\flow betweenness\\IERP\\IERP_N%dERp%.4f_noise%.2f_simu%d.txt",N,p,noise_amplitude,inputpara);
     writematrix(result,filename)
 end
 
